@@ -4,6 +4,22 @@ Projeto do app macOS que automatiza o build e o empacotamento do VoodooHDA.
 
 O repositório publicado deve conter apenas os arquivos do builder. O clone local de `VoodooHDA/` nao entra aqui, porque ele e baixado separadamente do repositório original e usado apenas como base de build.
 
+## Quick Start
+
+Clone este projeto:
+
+```bash
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
+cd VoodooHDA-Builder
+```
+
+Depois baixe as dependencias locais esperadas pelo builder:
+
+```bash
+git clone https://github.com/CloverHackyColor/VoodooHDA.git
+git clone https://github.com/acidanthera/MacKernelSDK.git
+```
+
 ## Clonar este projeto
 
 ```bash
@@ -45,6 +61,8 @@ swift run
 
 - Interface principal do app `VoodooHDA Builder`, mostrando o status final `3/3 VoodooHDA.pkg pronto`.
 - Tela de introducao do instalador `Instalar VoodooHDA Installer`, com o resumo da instalacao do driver e do painel de preferencias.
+
+Observacao: os prints foram recebidos na conversa, mas ainda nao existem como arquivos `.png` dentro do repositório. Assim que eles forem adicionados ao projeto, esta secao pode ser trocada por embeds diretos no README.
 
 ## O que o app faz
 
