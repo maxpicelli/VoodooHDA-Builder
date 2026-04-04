@@ -58,10 +58,13 @@ swift run
 
 ## Capturas de tela
 
-- Janela principal do `VoodooHDA Builder` com o status final `3/3 VoodooHDA.pkg pronto`.
-- Janela do instalador `Instalar VoodooHDA Installer` na etapa de introducao.
+### App
 
-Observacao: para embutir as imagens reais no README, os arquivos dos prints precisam existir dentro do repositório.
+![Janela principal do VoodooHDA Builder](../docs/images/Builder.png)
+
+### Instalador
+
+![Tela de introducao do instalador VoodooHDA](../docs/images/VoodooHDA-pkg.png)
 
 ## Paths padrao
 

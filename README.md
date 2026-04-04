@@ -59,10 +59,13 @@ swift run
 
 ## Capturas de tela
 
-- Interface principal do app `VoodooHDA Builder`, mostrando o status final `3/3 VoodooHDA.pkg pronto`.
-- Tela de introducao do instalador `Instalar VoodooHDA Installer`, com o resumo da instalacao do driver e do painel de preferencias.
+### App
 
-Observacao: os prints foram recebidos na conversa, mas ainda nao existem como arquivos `.png` dentro do repositório. Assim que eles forem adicionados ao projeto, esta secao pode ser trocada por embeds diretos no README.
+![Janela principal do VoodooHDA Builder](docs/images/Builder.png)
+
+### Instalador
+
+![Tela de introducao do instalador VoodooHDA](docs/images/VoodooHDA-pkg.png)
 
 ## O que o app faz
 
