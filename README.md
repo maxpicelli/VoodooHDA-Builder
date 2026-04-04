@@ -29,9 +29,10 @@ Voodoo-HDA-builder-compiler/
 ## Abrir no Xcode
 
 ```bash
-cd VoodooBuilderApp
-open Package.swift
+open VoodooBuilderApp/VoodooBuilderApp.xcodeproj
 ```
+
+Ou abra [Open VoodooHDA Builder in Xcode.command](Open%20VoodooHDA%20Builder%20in%20Xcode.command) com duplo clique no Finder para abrir direto o `.xcodeproj` no Xcode.
 
 No VS Code, tambem da para usar `Run Task` e executar `Open VoodooHDA Builder in Xcode`.
 

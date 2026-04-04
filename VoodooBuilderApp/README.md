@@ -28,12 +28,13 @@ O clone `VoodooHDA/` nao faz parte do repositório do builder. Ele continua send
 
 ## Abrir no Xcode
 
-Abra `Package.swift` no Xcode:
+Abra `VoodooBuilderApp.xcodeproj` no Xcode:
 
 ```bash
-cd VoodooBuilderApp
-open Package.swift
+open VoodooBuilderApp.xcodeproj
 ```
+
+Ou abra [Open VoodooHDA Builder in Xcode.command](../Open%20VoodooHDA%20Builder%20in%20Xcode.command) com duplo clique no Finder para abrir direto o `.xcodeproj` no Xcode.
 
 No VS Code, tambem da para usar `Run Task` e executar `Open VoodooHDA Builder in Xcode`.
 
