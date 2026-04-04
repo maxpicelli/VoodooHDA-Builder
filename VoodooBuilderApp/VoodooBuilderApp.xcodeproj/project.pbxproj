@@ -28,7 +28,7 @@
 		A10000000000000000000007 /* InstallerTemplate */ = {isa = PBXFileReference; lastKnownFileType = folder; path = InstallerTemplate; sourceTree = "<group>"; };
 		A10000000000000000000008 /* VoodooHDAPref.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = VoodooHDAPref.icns; sourceTree = "<group>"; };
 		A10000000000000000000009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A10000000000000000000020 /* VoodooHDA-Builder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VoodooHDA-Builder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000020 /* VoodooHDA Builder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VoodooHDA Builder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +67,7 @@
 		A10000000000000000000042 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000020 /* VoodooHDA-Builder.app */,
+				A10000000000000000000020 /* VoodooHDA Builder.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -98,8 +98,8 @@
 			dependencies = (
 			);
 			name = VoodooBuilderApp;
-			productName = "VoodooHDA-Builder";
-			productReference = A10000000000000000000020 /* VoodooHDA-Builder.app */;
+			productName = "VoodooHDA Builder";
+			productReference = A10000000000000000000020 /* VoodooHDA Builder.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -271,14 +271,14 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "VoodooHDA-Builder";
+				INFOPLIST_KEY_CFBundleDisplayName = "VoodooHDA Builder";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_VoodooBuilderSourceRoot = "$(SRCROOT)";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.voodoo.builderapp;
-				PRODUCT_NAME = "VoodooHDA-Builder";
+				PRODUCT_NAME = "VoodooHDA Builder";
 				REGISTER_APP_GROUPS = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -295,14 +295,14 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "VoodooHDA-Builder";
+				INFOPLIST_KEY_CFBundleDisplayName = "VoodooHDA Builder";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_VoodooBuilderSourceRoot = "$(SRCROOT)";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.voodoo.builderapp;
-				PRODUCT_NAME = "VoodooHDA-Builder";
+				PRODUCT_NAME = "VoodooHDA Builder";
 				REGISTER_APP_GROUPS = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

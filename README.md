@@ -1,4 +1,4 @@
-# VoodooHDA-Builder
+# VoodooHDA Builder
 
 Projeto do app macOS que automatiza o build e o empacotamento do VoodooHDA.
 
@@ -40,6 +40,11 @@ open Package.swift
 cd VoodooBuilderApp
 swift run
 ```
+
+## Capturas de tela
+
+- Interface principal do app `VoodooHDA Builder`, mostrando o status final `3/3 VoodooHDA.pkg pronto`.
+- Tela de introducao do instalador `Instalar VoodooHDA Installer`, com o resumo da instalacao do driver e do painel de preferencias.
 
 ## O que o app faz
 

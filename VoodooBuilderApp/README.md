@@ -1,4 +1,4 @@
-# VoodooBuilderApp
+# VoodooHDA Builder
 
 App SwiftUI para macOS que automatiza o pipeline do projeto VoodooHDA:
 
@@ -44,6 +44,11 @@ open Package.swift
 cd VoodooBuilderApp
 swift run
 ```
+
+## Capturas de tela
+
+- Janela principal do `VoodooHDA Builder` com o status final `3/3 VoodooHDA.pkg pronto`.
+- Janela do instalador `Instalar VoodooHDA Installer` na etapa de introducao.
 
 ## Paths padrao
 
