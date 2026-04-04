@@ -1,0 +1,16 @@
+.DS_Store
+.vscode/
+
+# Local dependency clones
+VoodooHDA/
+MacKernelSDK/
+VodooHDA-Installer-*/
+
+# SwiftPM and Xcode build outputs
+VoodooBuilderApp/.build/
+VoodooBuilderApp/build/
+
+# Workspace-local generated files
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/

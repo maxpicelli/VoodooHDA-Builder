@@ -1,0 +1,15 @@
+#!/bin/sh
+
+LOG_FILE="/private/tmp/VoodooHDA-sign.log"
+KEXT_PATH="/Library/Extensions/VoodooHDA.kext"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] sign start" >> "$LOG_FILE"
+
+if [ -d "$KEXT_PATH" ]; then
+    /usr/bin/codesign --force --deep --sign - "$KEXT_PATH" >> "$LOG_FILE" 2>&1 || true
+    /usr/bin/codesign -dv --verbose=4 "$KEXT_PATH" >> "$LOG_FILE" 2>&1 || true
+fi
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] sign end" >> "$LOG_FILE"
+
+exit 0

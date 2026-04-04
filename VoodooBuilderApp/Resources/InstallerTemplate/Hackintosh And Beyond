@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#  makeInstall.sh
+#
+#
+#  Created by Rodion Shingarev on 27.03.21.
+#
+cd "$(dirname "$0")"
+find . -name '.*' -type f -delete
+pkgbuild --component *.kext --install-location  /L*/E* Kext.pkg
+pkgbuild --component *.prefPane --install-location  ~/Library/PreferencePanes prefpane.pkg
+pkgbuild --root getdump --identifier GetDump --install-location  /opt/local/bin getdump.pkg
+productbuild --distribution dist.xml --package-path . --resources installer-ui VoodooHDA.pkg
+

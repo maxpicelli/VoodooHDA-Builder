@@ -1,0 +1,23 @@
+#!/bin/sh
+
+LOG_FILE="/private/tmp/VoodooHDA-cleanup.log"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] cleanup start" >> "$LOG_FILE"
+
+rm -rf /Library/Extensions/VoodooHDA.kext
+rm -rf /Library/LaunchAgents/org.voodoo.driver.plist
+rm -rf "/Library/Application Support/VoodooHDA"
+rm -rf /System/Library/Extensions/VoodooHDA.kext
+rm -rf /Library/Extensions/VoodooHDA.kext
+rm -rf /Library/PreferencePanes/VoodooHDA.prefPane
+
+find /Users -type d -path '*/Library/PreferencePanes/VoodooHDA.prefPane' -prune -exec rm -rf {} + 2>/dev/null || true
+find /Users -type f -path '*/Library/LaunchAgents/org.voodoo.driver.plist' -delete 2>/dev/null || true
+
+if command -v kextcache >/dev/null 2>&1; then
+    kextcache -i / || true
+fi
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] cleanup end" >> "$LOG_FILE"
+
+exit 0

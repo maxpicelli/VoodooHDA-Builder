@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>VoodooHDA Installer</title>
+    <background file="InstallerBackground.png" alignment="center" scaling="proportional"/>
+    <background-darkAqua file="InstallerBackgroundDark.png" alignment="center" scaling="proportional"/>
+    <welcome file="intro-text.rtf" mime-type="application/rtf"/>
+    <pkg-ref id="org.voodoo.driver.VoodooHDA"/>
+    <pkg-ref id="org.voodoo.VoodooHDA"/>
+    <pkg-ref id="GetDump"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="org.voodoo.driver.VoodooHDA"/>
+            <line choice="org.voodoo.VoodooHDA"/>
+            <line choice="GetDump"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="org.voodoo.driver.VoodooHDA" visible="false">
+        <pkg-ref id="org.voodoo.driver.VoodooHDA"/>
+    </choice>
+    <pkg-ref id="org.voodoo.driver.VoodooHDA" version="3.1.2" onConclusion="none">Kext.pkg</pkg-ref>
+    <choice id="org.voodoo.VoodooHDA" visible="false">
+        <pkg-ref id="org.voodoo.VoodooHDA"/>
+    </choice>
+    <pkg-ref id="org.voodoo.VoodooHDA" version="1.2.4" onConclusion="none">prefpane.pkg</pkg-ref>
+    <choice id="GetDump" visible="false">
+        <pkg-ref id="GetDump"/>
+    </choice>
+    <pkg-ref id="GetDump" version="0" onConclusion="none">getdump.pkg</pkg-ref>
+</installer-gui-script>
