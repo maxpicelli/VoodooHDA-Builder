@@ -12,5 +12,5 @@ VoodooBuilderApp/build/
 
 # Workspace-local generated files
 *.xcuserstate
-*.xcworkspace/xcuserdata/
-*.xcodeproj/xcuserdata/
+**/xcuserdata/
+**/*.xcuserstate
