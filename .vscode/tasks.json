@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "open",
             "args": [
-                "${workspaceFolder}/VoodooBuilderApp/VoodooBuilderApp.xcodeproj"
+                "${workspaceFolder}/VoodooHDA-Builder.xcworkspace"
             ],
             "problemMatcher": []
         }

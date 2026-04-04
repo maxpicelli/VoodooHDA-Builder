@@ -4,6 +4,8 @@ Projeto do app macOS que automatiza o build e o empacotamento do VoodooHDA.
 
 O repositório publicado deve conter apenas os arquivos do builder. O clone local de `VoodooHDA/` nao entra aqui, porque ele e baixado separadamente do repositório original e usado apenas como base de build.
 
+Na raiz do repositório existe um workspace `VoodooHDA-Builder.xcworkspace` que aponta para o projeto real do app em `VoodooBuilderApp/VoodooBuilderApp.xcodeproj`.
+
 ## Quick Start
 
 Clone este projeto:
@@ -29,10 +31,10 @@ Voodoo-HDA-builder-compiler/
 ## Abrir no Xcode
 
 ```bash
-open VoodooBuilderApp/VoodooBuilderApp.xcodeproj
+open VoodooHDA-Builder.xcworkspace
 ```
 
-Ou abra [Open VoodooHDA Builder in Xcode.command](Open%20VoodooHDA%20Builder%20in%20Xcode.command) com duplo clique no Finder para abrir direto o `.xcodeproj` no Xcode.
+Ou abra [Open VoodooHDA Builder in Xcode.command](Open%20VoodooHDA%20Builder%20in%20Xcode.command) com duplo clique no Finder para abrir direto o workspace no Xcode.
 
 No VS Code, tambem da para usar `Run Task` e executar `Open VoodooHDA Builder in Xcode`.
 
