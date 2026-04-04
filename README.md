@@ -13,26 +13,9 @@ git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
 cd VoodooHDA-Builder
 ```
 
-Depois baixe as dependencias locais esperadas pelo builder:
+Depois abra o app. Se `VoodooHDA` ou `MacKernelSDK` nao existirem no workspace escolhido, o builder faz o clone automaticamente.
 
-```bash
-git clone https://github.com/CloverHackyColor/VoodooHDA.git
-git clone https://github.com/acidanthera/MacKernelSDK.git
-```
-
-## Clonar este projeto
-
-```bash
-git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
-cd VoodooHDA-Builder
-```
-
-## Clonar as dependencias locais
-
-```bash
-git clone https://github.com/CloverHackyColor/VoodooHDA.git
-git clone https://github.com/acidanthera/MacKernelSDK.git
-```
+O builder tenta reutilizar clones locais existentes, mas tambem consegue baixar automaticamente o `VoodooHDA` e o `MacKernelSDK` quando eles ainda nao existem no workspace.
 
 ## Estrutura esperada no workspace
 
@@ -82,4 +65,5 @@ swift run
 ## Notas
 
 - `VoodooHDA/` e uma dependencia local e fica fora deste repositório.
+- o app clona ou atualiza automaticamente `VoodooHDA/` e `MacKernelSDK/` quando necessario.
 - artefatos de build do Xcode e do SwiftPM tambem ficam ignorados.

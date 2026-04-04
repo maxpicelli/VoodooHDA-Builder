@@ -18,27 +18,13 @@ App SwiftUI para macOS que automatiza o pipeline do projeto VoodooHDA:
 ```bash
 git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
 cd VoodooHDA-Builder
-git clone https://github.com/CloverHackyColor/VoodooHDA.git
-git clone https://github.com/acidanthera/MacKernelSDK.git
 cd VoodooBuilderApp
 swift run
 ```
 
-## Clonar este projeto
+Se `VoodooHDA` ou `MacKernelSDK` nao existirem no workspace escolhido, o app baixa essas dependencias automaticamente.
 
-```bash
-git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
-cd VoodooHDA-Builder
-```
-
-## Dependencias locais
-
-O clone `VoodooHDA/` nao faz parte do repositório do builder. Ele deve existir localmente como base de compilacao.
-
-```bash
-git clone https://github.com/CloverHackyColor/VoodooHDA.git
-git clone https://github.com/acidanthera/MacKernelSDK.git
-```
+O clone `VoodooHDA/` nao faz parte do repositório do builder. Ele continua sendo uma dependencia local de build, mas o proprio app pode clonar ou atualizar `VoodooHDA` e `MacKernelSDK` automaticamente.
 
 ## Abrir no Xcode
 
