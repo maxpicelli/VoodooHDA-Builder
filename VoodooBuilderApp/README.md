@@ -35,6 +35,8 @@ cd VoodooBuilderApp
 open Package.swift
 ```
 
+No VS Code, tambem da para usar `Run Task` e executar `Open VoodooHDA Builder in Xcode`.
+
 ## Rodar pelo terminal
 
 ```bash
