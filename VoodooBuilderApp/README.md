@@ -16,8 +16,7 @@ App SwiftUI para macOS que automatiza o pipeline do projeto VoodooHDA:
 ## Quick Start
 
 ```bash
-git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
-cd VoodooHDA-Builder
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder
 cd VoodooBuilderApp
 swift run
 ```

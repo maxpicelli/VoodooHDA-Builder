@@ -11,8 +11,7 @@ Na raiz do repositório existe um workspace `VoodooHDA-Builder.xcworkspace` que 
 Clone este projeto:
 
 ```bash
-git clone https://github.com/maxpicelli/VoodooHDA-Builder.git
-cd VoodooHDA-Builder
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder
 ```
 
 Depois abra o app. Se `VoodooHDA` ou `MacKernelSDK` nao existirem no workspace escolhido, o builder faz o clone automaticamente.
