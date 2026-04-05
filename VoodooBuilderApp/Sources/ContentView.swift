@@ -5,6 +5,10 @@ struct ContentView: View {
     @EnvironmentObject private var model: BuildViewModel
     @Environment(\.colorScheme) private var colorScheme
 
+    private var language: AppLanguage {
+        model.configuration.appLanguage
+    }
+
     var body: some View {
         ZStack {
             LinearGradient(
@@ -36,7 +40,7 @@ struct ContentView: View {
                         Text("VoodooHDA Builder")
                             .font(.system(size: 26, weight: .bold, design: .rounded))
 
-                        Text("Compila kext, pref pane e gera o instalador sem alterar o fluxo original.")
+                        Text(AppStrings.subtitle(language))
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -45,10 +49,26 @@ struct ContentView: View {
                     Spacer(minLength: 0)
                 }
 
+                HStack(alignment: .center, spacing: 12) {
+                    Text(AppStrings.languageLabel(language))
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.secondary)
+
+                    Picker(AppStrings.languageLabel(language), selection: Binding(get: {
+                        model.configuration.appLanguage
+                    }, set: { model.updateLanguage($0) })) {
+                        ForEach(AppLanguage.allCases) { appLanguage in
+                            Text(appLanguage.pickerTitle).tag(appLanguage)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+
                 VStack(alignment: .leading, spacing: 14) {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Status")
+                            Text(AppStrings.statusLabel(language))
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.secondary)
 
@@ -60,7 +80,7 @@ struct ContentView: View {
 
                         Spacer(minLength: 12)
 
-                        Text(model.isRunning ? "EM EXECUCAO" : "PRONTO")
+                        Text(model.isRunning ? AppStrings.runningBadge(language) : AppStrings.readyBadge(language))
                             .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(statusBadgeForeground)
                             .padding(.horizontal, 10)
@@ -88,7 +108,7 @@ struct ContentView: View {
                         .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.10 : 0.22), lineWidth: 1)
                 )
 
-                Button(model.isRunning ? "Processando..." : "Criar VoodooHDA.pkg") {
+                Button(model.isRunning ? AppStrings.processingButton(language) : AppStrings.buildButton(language)) {
                     model.runAll()
                 }
                 .buttonStyle(.borderedProminent)
@@ -97,14 +117,16 @@ struct ContentView: View {
                 .controlSize(.large)
                 .frame(maxWidth: .infinity)
 
-                Text("O instalador abre automaticamente quando o pacote terminar de ser gerado.")
+                Text(AppStrings.autoOpenNote(language))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 4)
             }
             .padding(26)
         }
-        .frame(width: 420, height: 320)
+        .frame(width: 420, height: 356)
     }
 
     private var backgroundGradient: [Color] {

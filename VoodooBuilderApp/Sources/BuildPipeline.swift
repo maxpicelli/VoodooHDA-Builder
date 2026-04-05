@@ -2,10 +2,10 @@ import AppKit
 import Foundation
 
 enum PipelineStep: String, CaseIterable, Identifiable {
-    case removePrevious = "Removendo versoes anteriores"
-    case buildKext = "Compilando kext"
-    case buildPrefPane = "Compilando pref pane"
-    case buildInstaller = "Gerando VoodooHDA.pkg"
+    case removePrevious
+    case buildKext
+    case buildPrefPane
+    case buildInstaller
 
     var id: String { rawValue }
 }
@@ -40,7 +40,7 @@ final class BuildPipeline {
         try fileManager.createDirectory(atPath: configuration.workspaceDirectory, withIntermediateDirectories: true)
 
         if !fileManager.fileExists(atPath: configuration.repositoryDirectory) {
-            appendLog("Baixando VoodooHDA do GitHub para \(configuration.repositoryDirectory).\n")
+            appendLog(AppStrings.downloadingRepository(path: configuration.repositoryDirectory, language: configuration.appLanguage))
             let command = "git clone \(configuration.repositoryURL.shellQuoted) \(configuration.repositoryDirectory.shellQuoted)"
             _ = try await runner.run(command, in: configuration.workspaceDirectory, onOutput: appendLog)
             return
@@ -48,11 +48,11 @@ final class BuildPipeline {
 
         let gitDirectory = configuration.repositoryDirectory + "/.git"
         guard fileManager.fileExists(atPath: gitDirectory) else {
-            appendLog("Repositorio local encontrado em \(configuration.repositoryDirectory). Pulando atualizacao git porque a pasta nao tem .git.\n")
+            appendLog(AppStrings.localRepositoryWithoutGit(path: configuration.repositoryDirectory, language: configuration.appLanguage))
             return
         }
 
-        appendLog("Repositorio local encontrado. Atualizando checkout do VoodooHDA.\n")
+        appendLog(AppStrings.updatingRepository(configuration.appLanguage))
         _ = try await runner.run("git fetch --all --tags --prune", in: configuration.repositoryDirectory, onOutput: appendLog)
         _ = try await runner.run("git pull --ff-only", in: configuration.repositoryDirectory, onOutput: appendLog)
     }
@@ -64,13 +64,13 @@ final class BuildPipeline {
             let cloneCommand = "git clone https://github.com/joevt/MacKernelSDK.git \(configuration.kernelSDKDirectory.shellQuoted)"
             _ = try await runner.run(cloneCommand, in: configuration.workspaceDirectory, onOutput: appendLog)
         } else {
-            appendLog("MacKernelSDK local encontrado em \(configuration.kernelSDKDirectory).\n")
+            appendLog(AppStrings.foundKernelSDK(path: configuration.kernelSDKDirectory, language: configuration.appLanguage))
         }
 
         let symlinkPath = configuration.repositoryDirectory + "/MacKernelSDK"
 
         if fileManager.fileExists(atPath: symlinkPath) || (try? fileManager.destinationOfSymbolicLink(atPath: symlinkPath)) != nil {
-            appendLog("Link MacKernelSDK ja existe em \(symlinkPath).\n")
+            appendLog(AppStrings.kernelSDKLinkExists(path: symlinkPath, language: configuration.appLanguage))
             return
         }
 
@@ -90,13 +90,13 @@ final class BuildPipeline {
 
         let command = "xcodebuild -project ./VHDAPrefPane/VoodooHDA/VoodooHDA.xcodeproj -alltargets -configuration Release build"
         _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)
-        try ensurePathExists(configuration.prefPaneOutputPath, description: "pref pane")
-        appendLog("Pref pane gerada em \(configuration.prefPaneOutputPath).\n")
+        try ensurePathExists(configuration.prefPaneOutputPath, description: ArtifactDescription.prefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        appendLog(AppStrings.prefPaneBuilt(path: configuration.prefPaneOutputPath, language: configuration.appLanguage))
 
         let prefPaneDestination = configuration.installerWorkingDirectory + "/VoodooHDA.prefPane"
         try replaceItem(at: prefPaneDestination, with: configuration.prefPaneOutputPath)
-        try ensurePathExists(prefPaneDestination, description: "pref pane copiada")
-        appendLog("Pref pane copiada para \(prefPaneDestination).\n")
+        try ensurePathExists(prefPaneDestination, description: ArtifactDescription.copiedPrefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        appendLog(AppStrings.prefPaneCopied(path: prefPaneDestination, language: configuration.appLanguage))
     }
 
     private func buildKext(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
@@ -106,40 +106,40 @@ final class BuildPipeline {
 
         let command = "xcodebuild -project ./tranc/VoodooHDA_BS.xcodeproj -target VoodooHDA -configuration Release build"
         _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)
-        try ensurePathExists(configuration.kextOutputPath, description: "kext")
-        appendLog("Kext gerada em \(configuration.kextOutputPath).\n")
+        try ensurePathExists(configuration.kextOutputPath, description: ArtifactDescription.kext.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        appendLog(AppStrings.kextBuilt(path: configuration.kextOutputPath, language: configuration.appLanguage))
 
         let kextDestination = configuration.installerWorkingDirectory + "/VoodooHDA.kext"
         try replaceItem(at: kextDestination, with: configuration.kextOutputPath)
-        try ensurePathExists(kextDestination, description: "kext copiada")
-        appendLog("Kext copiada para \(kextDestination).\n")
+        try ensurePathExists(kextDestination, description: ArtifactDescription.copiedKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        appendLog(AppStrings.kextCopied(path: kextDestination, language: configuration.appLanguage))
     }
 
     private func buildInstaller(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
         try prepareInstallerWorkspace(configuration: configuration, reset: false)
         try syncCompiledInstallerArtifacts(configuration: configuration)
-        try ensurePathExists(configuration.installerWorkingDirectory + "/VoodooHDA.kext", description: "kext na pasta do instalador")
-        try ensurePathExists(configuration.installerWorkingDirectory + "/VoodooHDA.prefPane", description: "pref pane na pasta do instalador")
-        try ensurePathExists(configuration.installerScriptPath, description: "makeInstall.sh")
+        try ensurePathExists(configuration.installerWorkingDirectory + "/VoodooHDA.kext", description: ArtifactDescription.installerKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        try ensurePathExists(configuration.installerWorkingDirectory + "/VoodooHDA.prefPane", description: ArtifactDescription.installerPrefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        try ensurePathExists(configuration.installerScriptPath, description: ArtifactDescription.installerScript.text(for: configuration.appLanguage), language: configuration.appLanguage)
         let scriptDirectory = URL(fileURLWithPath: configuration.installerScriptPath).deletingLastPathComponent().path
         let command = "chmod +x \(configuration.installerScriptPath.shellQuoted) && ./makeInstall.sh"
         _ = try await runner.run(command, in: scriptDirectory, onOutput: appendLog)
-        try ensurePathExists(configuration.outputPackagePath, description: "VoodooHDA.pkg")
+        try ensurePathExists(configuration.outputPackagePath, description: "VoodooHDA.pkg", language: configuration.appLanguage)
 
         try applyPackageIcon(configuration: configuration, packagePath: configuration.outputPackagePath)
-        appendLog("Icone aplicado ao pkg gerado.\n")
+        appendLog(AppStrings.packageIconApplied(configuration.appLanguage))
 
         let openPackageCommand = "open \(configuration.outputPackagePath.shellQuoted)"
         _ = try await runner.run(openPackageCommand, in: configuration.workspaceDirectory, onOutput: appendLog)
-        appendLog("VoodooHDA.pkg aberto a partir de \(configuration.installerWorkingDirectory).\n")
+        appendLog(AppStrings.packageOpened(path: configuration.installerWorkingDirectory, language: configuration.appLanguage))
 
         let openFolderCommand = "open \(configuration.installerWorkingDirectory.shellQuoted)"
         _ = try await runner.run(openFolderCommand, in: configuration.workspaceDirectory, onOutput: appendLog)
-        appendLog("Pasta VoodooHDA-Installer-Work aberta no Finder.\n")
+        appendLog(AppStrings.installerFolderOpened(configuration.appLanguage))
     }
 
     private func prepareInstallerWorkspace(configuration: BuildConfiguration, reset: Bool) throws {
-        try ensurePathExists(configuration.installerTemplateDirectory, description: "template do instalador")
+        try ensurePathExists(configuration.installerTemplateDirectory, description: ArtifactDescription.installerTemplate.text(for: configuration.appLanguage), language: configuration.appLanguage)
 
         if reset && fileManager.fileExists(atPath: configuration.installerWorkingDirectory) {
             try fileManager.removeItem(atPath: configuration.installerWorkingDirectory)
@@ -176,8 +176,8 @@ final class BuildPipeline {
     }
 
     private func syncCompiledInstallerArtifacts(configuration: BuildConfiguration) throws {
-        try ensurePathExists(configuration.kextOutputPath, description: "kext Release compilada")
-        try ensurePathExists(configuration.prefPaneOutputPath, description: "pref pane Release compilada")
+        try ensurePathExists(configuration.kextOutputPath, description: ArtifactDescription.compiledKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        try ensurePathExists(configuration.prefPaneOutputPath, description: ArtifactDescription.compiledPrefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
 
         let kextDestination = configuration.installerWorkingDirectory + "/VoodooHDA.kext"
         let prefPaneDestination = configuration.installerWorkingDirectory + "/VoodooHDA.prefPane"
@@ -186,9 +186,9 @@ final class BuildPipeline {
         try replaceItem(at: prefPaneDestination, with: configuration.prefPaneOutputPath)
     }
 
-    private func ensurePathExists(_ path: String, description: String) throws {
+    private func ensurePathExists(_ path: String, description: String, language: AppLanguage) throws {
         if !fileManager.fileExists(atPath: path) {
-            throw NSError(domain: "VoodooBuilderApp", code: 1, userInfo: [NSLocalizedDescriptionKey: "Nao encontrei \(description) em \(path)"])
+            throw NSError(domain: "VoodooBuilderApp", code: 1, userInfo: [NSLocalizedDescriptionKey: AppStrings.pathNotFound(description: description, path: path, language: language)])
         }
     }
 
@@ -208,16 +208,16 @@ final class BuildPipeline {
             iconPath = configuration.sourcePrefPaneIconPath
         }
 
-        try ensurePathExists(iconPath, description: "icone do pref pane")
-        try ensurePathExists(packagePath, description: "pkg")
+        try ensurePathExists(iconPath, description: ArtifactDescription.prefPaneIcon.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        try ensurePathExists(packagePath, description: ArtifactDescription.package.text(for: configuration.appLanguage), language: configuration.appLanguage)
 
         guard let image = NSImage(contentsOfFile: iconPath) else {
-            throw NSError(domain: "VoodooBuilderApp", code: 2, userInfo: [NSLocalizedDescriptionKey: "Nao consegui carregar o icone em \(iconPath)"])
+            throw NSError(domain: "VoodooBuilderApp", code: 2, userInfo: [NSLocalizedDescriptionKey: AppStrings.couldNotLoadIcon(path: iconPath, language: configuration.appLanguage)])
         }
 
         let success = NSWorkspace.shared.setIcon(image, forFile: packagePath, options: [])
         if !success {
-            throw NSError(domain: "VoodooBuilderApp", code: 3, userInfo: [NSLocalizedDescriptionKey: "Nao consegui aplicar o icone ao pkg em \(packagePath)"])
+            throw NSError(domain: "VoodooBuilderApp", code: 3, userInfo: [NSLocalizedDescriptionKey: AppStrings.couldNotApplyIcon(path: packagePath, language: configuration.appLanguage)])
         }
     }
 

@@ -16,6 +16,7 @@
 		A10000000000000000000017 /* InstallerTemplate in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* InstallerTemplate */; };
 		A10000000000000000000018 /* VoodooHDAPref.icns in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* VoodooHDAPref.icns */; };
 		A10000000000000000000019 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* Assets.xcassets */; };
+		A10000000000000000000021 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* Localization.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		A10000000000000000000008 /* VoodooHDAPref.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = VoodooHDAPref.icns; sourceTree = "<group>"; };
 		A10000000000000000000009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000020 /* VoodooHDA Builder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VoodooHDA Builder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000022 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000003 /* BuildConfiguration.swift */,
+				A10000000000000000000022 /* Localization.swift */,
 				A10000000000000000000005 /* BuildPipeline.swift */,
 				A10000000000000000000006 /* BuildViewModel.swift */,
 				A10000000000000000000002 /* ContentView.swift */,
@@ -154,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000013 /* BuildConfiguration.swift in Sources */,
+				A10000000000000000000021 /* Localization.swift in Sources */,
 				A10000000000000000000015 /* BuildPipeline.swift in Sources */,
 				A10000000000000000000016 /* BuildViewModel.swift in Sources */,
 				A10000000000000000000012 /* ContentView.swift in Sources */,

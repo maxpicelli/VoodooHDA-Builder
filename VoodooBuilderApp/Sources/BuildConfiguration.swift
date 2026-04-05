@@ -2,6 +2,7 @@ import Foundation
 
 struct BuildConfiguration: Codable, Equatable {
     var repositoryURL: String = "https://github.com/CloverHackyColor/VoodooHDA.git"
+    var appLanguage: AppLanguage
     var workspaceDirectory: String
     var repositoryDirectory: String
     var installerTemplateDirectory: String
@@ -12,6 +13,7 @@ struct BuildConfiguration: Codable, Equatable {
 
     init(
         repositoryURL: String = "https://github.com/CloverHackyColor/VoodooHDA.git",
+        appLanguage: AppLanguage = .ptBR,
         workspaceDirectory: String = BuildConfiguration.defaultWorkspaceDirectory,
         repositoryDirectory: String? = nil,
         installerTemplateDirectory: String? = nil,
@@ -24,6 +26,7 @@ struct BuildConfiguration: Codable, Equatable {
         let resolvedInstallerTemplateDirectory = installerTemplateDirectory ?? BuildConfiguration.defaultInstallerTemplateDirectory
 
         self.repositoryURL = repositoryURL
+        self.appLanguage = appLanguage
         self.workspaceDirectory = normalizedWorkspaceDirectory
         self.repositoryDirectory = repositoryDirectory ?? normalizedWorkspaceDirectory + "/VoodooHDA"
         self.installerTemplateDirectory = resolvedInstallerTemplateDirectory
@@ -37,11 +40,13 @@ struct BuildConfiguration: Codable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let workspace = try container.decodeIfPresent(String.self, forKey: .workspaceDirectory) ?? BuildConfiguration.defaultWorkspaceDirectory
         let repositoryURL = try container.decodeIfPresent(String.self, forKey: .repositoryURL) ?? "https://github.com/CloverHackyColor/VoodooHDA.git"
+        let appLanguage = try container.decodeIfPresent(AppLanguage.self, forKey: .appLanguage) ?? .ptBR
         let autoOpenInstaller = try container.decodeIfPresent(Bool.self, forKey: .autoOpenInstaller) ?? false
         let autoOpenOutputFolder = try container.decodeIfPresent(Bool.self, forKey: .autoOpenOutputFolder) ?? true
 
         self.init(
             repositoryURL: repositoryURL,
+            appLanguage: appLanguage,
             workspaceDirectory: workspace,
             autoOpenInstaller: autoOpenInstaller,
             autoOpenOutputFolder: autoOpenOutputFolder

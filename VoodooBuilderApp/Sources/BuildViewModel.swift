@@ -9,15 +9,15 @@ final class BuildViewModel: ObservableObject {
     @Published var logOutput: String = ""
     @Published var isRunning = false
     @Published var activeStep: PipelineStep?
-    @Published var statusMessage = "Pronto"
+    @Published var status: BuildStatus = .ready
     @Published private var completedStepCount = 0
 
     var progressLine: String {
         if let step = activeStep {
-            return "\(completedStepCount)/\(totalStepCount)  \(step.rawValue)"
+            return AppStrings.runningProgress(completed: completedStepCount, total: totalStepCount, step: step, language: configuration.appLanguage)
         }
 
-        return statusMessage
+        return status.text(totalStepCount: totalStepCount, language: configuration.appLanguage)
     }
 
     var progressValue: Double {
@@ -64,6 +64,12 @@ final class BuildViewModel: ObservableObject {
         try? data.write(to: BuildConfiguration.storageURL)
     }
 
+    func updateLanguage(_ language: AppLanguage) {
+        guard configuration.appLanguage != language else { return }
+        configuration.appLanguage = language
+        persistConfiguration()
+    }
+
     private func repairInvalidPathsIfNeeded() {
         let normalizedWorkspace = BuildConfiguration.normalizeWorkspaceDirectory(configuration.workspaceDirectory)
         let hasLegacyRepositoryPath = configuration.repositoryDirectory == "//VoodooHDA"
@@ -79,6 +85,7 @@ final class BuildViewModel: ObservableObject {
 
         configuration = BuildConfiguration(
             repositoryURL: configuration.repositoryURL,
+            appLanguage: configuration.appLanguage,
             workspaceDirectory: normalizedWorkspace,
             autoOpenInstaller: configuration.autoOpenInstaller,
             autoOpenOutputFolder: configuration.autoOpenOutputFolder
@@ -91,15 +98,15 @@ final class BuildViewModel: ObservableObject {
         isRunning = true
         completedStepCount = completedCount(for: step)
         activeStep = step
-        statusMessage = step.rawValue
+        status = .ready
         persistConfiguration()
 
         do {
             try await pipeline.run(step: step, configuration: configuration, appendLog: appendLog)
             completedStepCount = completedCount(for: step) + (step == .removePrevious ? 0 : 1)
-            statusMessage = successMessage(for: step)
+            status = .stepSucceeded(step)
         } catch {
-            statusMessage = "Falhou: \(step.rawValue)"
+            status = .failed(step)
         }
 
         activeStep = nil
@@ -110,7 +117,7 @@ final class BuildViewModel: ObservableObject {
         guard !isRunning else { return }
         isRunning = true
         completedStepCount = 0
-        statusMessage = PipelineStep.buildKext.rawValue
+        status = .ready
         persistConfiguration()
 
         let steps: [PipelineStep] = [.buildKext, .buildPrefPane, .buildInstaller]
@@ -119,35 +126,17 @@ final class BuildViewModel: ObservableObject {
             for (index, step) in steps.enumerated() {
                 completedStepCount = index
                 activeStep = step
-                statusMessage = step.rawValue
                 try await pipeline.run(step: step, configuration: configuration, appendLog: appendLog)
             }
 
             completedStepCount = steps.count
-            statusMessage = "\(totalStepCount)/\(totalStepCount)  VoodooHDA.pkg pronto"
+            status = .allSucceeded
         } catch {
-            if let step = activeStep {
-                statusMessage = "Falhou: \(step.rawValue)"
-            } else {
-                statusMessage = "Falhou"
-            }
+            status = .failed(activeStep)
         }
 
         activeStep = nil
         isRunning = false
-    }
-
-    private func successMessage(for step: PipelineStep) -> String {
-        switch step {
-        case .removePrevious:
-            return "Remocao concluida"
-        case .buildKext:
-            return "1/3  Kext pronta"
-        case .buildPrefPane:
-            return "2/3  Pref pane pronta"
-        case .buildInstaller:
-            return "3/3  VoodooHDA.pkg pronto"
-        }
     }
 
     private func completedCount(for step: PipelineStep) -> Int {
