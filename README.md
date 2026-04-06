@@ -6,12 +6,24 @@ O repositório publicado deve conter apenas os arquivos do builder. O clone loca
 
 Na raiz do repositório existe um workspace `VoodooHDA-Builder.xcworkspace` que aponta para o projeto real do app em `VoodooBuilderApp/VoodooBuilderApp.xcodeproj`.
 
+## Requisitos
+
+- macOS
+- Xcode instalado
+- Xcode Command Line Tools instaladas com `xcode-select --install`
+
 ## Quick Start
 
-Clone este projeto:
+Clone este projeto e abra a pasta no Finder:
 
 ```bash
-git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder && open .
+```
+
+Ou clone e abra direto no Xcode:
+
+```bash
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder && open VoodooHDA-Builder.xcworkspace
 ```
 
 Depois abra o app. Se `VoodooHDA` ou `MacKernelSDK` nao existirem no workspace escolhido, o builder faz o clone automaticamente.
