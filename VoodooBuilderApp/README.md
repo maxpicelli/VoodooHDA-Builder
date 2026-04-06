@@ -15,9 +15,13 @@ App SwiftUI para macOS que automatiza o pipeline do projeto VoodooHDA:
 
 ## Requisitos
 
-- macOS
+- macOS 13 ou mais recente
 - Xcode instalado
 - Xcode Command Line Tools instaladas com `xcode-select --install`
+- Git disponível no sistema
+- conexão com a internet para o clone automático de `VoodooHDA` e `MacKernelSDK`
+
+Python nao e necessario para o app rodar nem para o pipeline principal.
 
 ## Quick Start
 
