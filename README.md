@@ -9,6 +9,7 @@ Na raiz do repositório existe um workspace `VoodooHDA-Builder.xcworkspace` que 
 ## Requisitos
 
 - macOS 13 ou mais recente
+- Processadores intel (não funciona com a séria M Apple Silicom arm64)
 - Xcode instalado
 - Xcode Command Line Tools instaladas com `xcode-select --install`
 - Git disponível no sistema
