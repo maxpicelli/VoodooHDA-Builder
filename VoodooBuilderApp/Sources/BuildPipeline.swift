@@ -83,6 +83,18 @@ final class BuildPipeline {
         _ = try await runner.run(command, in: configuration.workspaceDirectory, onOutput: appendLog)
     }
 
+    // O upstream VoodooHDA/tranc/VoodooHDADevice.cpp inclui "GitCommit.h", mas esse
+    // arquivo nao e versionado no repositorio (e gerado localmente). Sem ele o
+    // clang falha com "'GitCommit.h' file not found". Geramos o header aqui, a
+    // cada build do kext, para que futuras atualizacoes do repositorio original
+    // continuem compilando sem intervencao manual.
+    private func ensureGitCommitHeader(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
+        let headerPath = configuration.repositoryDirectory + "/tranc/GitCommit.h"
+        appendLog(AppStrings.generatingGitCommitHeader(path: headerPath, language: configuration.appLanguage))
+        let command = "mkdir -p tranc && commit=$(git rev-parse --short HEAD 2>/dev/null || echo unknown) && printf '#pragma once\\n#define VOODOO_HDA_GIT_COMMIT \"%s\"\\n' \"$commit\" > tranc/GitCommit.h"
+        _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)
+    }
+
     private func buildPrefPane(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
         try await prepareRepository(configuration: configuration, appendLog: appendLog)
         try await prepareKernelSDK(configuration: configuration, appendLog: appendLog)
@@ -103,6 +115,7 @@ final class BuildPipeline {
         try await prepareRepository(configuration: configuration, appendLog: appendLog)
         try await prepareKernelSDK(configuration: configuration, appendLog: appendLog)
         try prepareInstallerWorkspace(configuration: configuration, reset: false)
+        try await ensureGitCommitHeader(configuration: configuration, appendLog: appendLog)
 
         let command = "xcodebuild -project ./tranc/VoodooHDA_BS.xcodeproj -target VoodooHDA -configuration Release build"
         _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)

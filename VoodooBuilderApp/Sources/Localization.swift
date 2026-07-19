@@ -273,6 +273,15 @@ enum AppStrings {
         }
     }
 
+    static func generatingGitCommitHeader(path: String, language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Gerando \(path) a partir do commit atual do VoodooHDA.\n"
+        case .eng:
+            return "Generating \(path) from the current VoodooHDA commit.\n"
+        }
+    }
+
     static func prefPaneBuilt(path: String, language: AppLanguage) -> String {
         switch language {
         case .ptBR:
