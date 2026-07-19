@@ -345,6 +345,51 @@ enum AppStrings {
         }
     }
 
+    static func removeVoodooButton(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Remover VoodooHDA"
+        case .eng:
+            return "Remove VoodooHDA"
+        }
+    }
+
+    static func removeConfirmTitle(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Remover VoodooHDA do sistema?"
+        case .eng:
+            return "Remove VoodooHDA from the system?"
+        }
+    }
+
+    static func removeConfirmMessage(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Isso fecha as Preferencias/Ajustes do Sistema e apaga a kext, o pref pane e os arquivos relacionados do VoodooHDA. Vai pedir sua senha de administrador. Essa acao nao pode ser desfeita."
+        case .eng:
+            return "This closes System Preferences/Settings and deletes the VoodooHDA kext, pref pane, and related files. You'll be asked for your administrator password. This action cannot be undone."
+        }
+    }
+
+    static func removeConfirmButton(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Remover"
+        case .eng:
+            return "Remove"
+        }
+    }
+
+    static func cancelButton(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Cancelar"
+        case .eng:
+            return "Cancel"
+        }
+    }
+
     static func pathNotFound(description: String, path: String, language: AppLanguage) -> String {
         switch language {
         case .ptBR:

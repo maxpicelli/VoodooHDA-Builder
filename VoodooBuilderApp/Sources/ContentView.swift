@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var model: BuildViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @State private var showRemoveConfirmation = false
 
     private var language: AppLanguage {
         model.configuration.appLanguage
@@ -108,14 +109,25 @@ struct ContentView: View {
                         .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.10 : 0.22), lineWidth: 1)
                 )
 
-                Button(model.isRunning ? AppStrings.processingButton(language) : AppStrings.buildButton(language)) {
-                    model.runAll()
+                HStack(spacing: 8) {
+                    Button(model.isRunning ? AppStrings.processingButton(language) : AppStrings.buildButton(language)) {
+                        model.runAll()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color(nsColor: .controlAccentColor))
+                    .disabled(model.isRunning)
+                    .controlSize(.large)
+                    .frame(maxWidth: .infinity)
+
+                    Button(AppStrings.removeVoodooButton(language)) {
+                        showRemoveConfirmation = true
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                    .controlSize(.small)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .disabled(model.isRunning)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Color(nsColor: .controlAccentColor))
-                .disabled(model.isRunning)
-                .controlSize(.large)
-                .frame(maxWidth: .infinity)
 
                 Text(AppStrings.autoOpenNote(language))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -126,7 +138,19 @@ struct ContentView: View {
             }
             .padding(26)
         }
-        .frame(width: 420, height: 356)
+        .frame(width: 420, height: 382)
+        .confirmationDialog(
+            AppStrings.removeConfirmTitle(language),
+            isPresented: $showRemoveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(AppStrings.removeConfirmButton(language), role: .destructive) {
+                model.run(step: .removePrevious)
+            }
+            Button(AppStrings.cancelButton(language), role: .cancel) {}
+        } message: {
+            Text(AppStrings.removeConfirmMessage(language))
+        }
     }
 
     private var backgroundGradient: [Color] {

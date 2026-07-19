@@ -78,8 +78,13 @@ final class BuildPipeline {
         _ = try await runner.run(linkCommand, in: configuration.workspaceDirectory, onOutput: appendLog)
     }
 
+    // Remocao requer privilegios de root para apagar itens em /Library e
+    // /System/Library. Em vez de chamar sudo diretamente (que trava esperando
+    // senha em um processo sem terminal), delegamos a elevacao ao
+    // Authorization Services do macOS via osascript, que exibe o dialogo
+    // nativo de autenticacao do sistema.
     private func removePrevious(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
-        let command = "rm -rf /Library/Extensions/VoodooHDA.kext /Library/LaunchAgents/org.voodoo.driver.plist '/Library/Application Support/VoodooHDA' /System/Library/Extensions/VoodooHDA.kext /Library/Extensions/VoodooHDA.kext /Library/PreferencePanes/VoodooHDA.prefPane && find /Users -type d -path '*/Library/PreferencePanes/VoodooHDA.prefPane' -prune -exec rm -rf {} + 2>/dev/null || true && if command -v kextcache >/dev/null 2>&1; then kextcache -i / || true; fi"
+        let command = #"osascript -e 'do shell script "killall \"System Preferences\" >/dev/null 2>&1; killall \"System Settings\" >/dev/null 2>&1; rm -rf /Library/Extensions/VoodooHDA.kext /Library/LaunchAgents/org.voodoo.driver.plist \"/Library/Application Support/VoodooHDA\" /System/Library/Extensions/VoodooHDA.kext /Library/PreferencePanes/VoodooHDA.prefPane; find /Users -type d -path \"*/Library/PreferencePanes/VoodooHDA.prefPane\" -prune -exec rm -rf {} + >/dev/null 2>&1; if command -v kextcache >/dev/null 2>&1; then kextcache -i / >/dev/null 2>&1; fi; true" with administrator privileges'"#
         _ = try await runner.run(command, in: configuration.workspaceDirectory, onOutput: appendLog)
     }
 
