@@ -12,6 +12,13 @@ enum PipelineStep: String, CaseIterable, Identifiable {
 
 @MainActor
 final class BuildPipeline {
+    // O upstream ainda declara MACOSX_DEPLOYMENT_TARGET 10.13 (kext) e 11.5
+    // (prefPane), valores recusados pelo Xcode 26+ (minimo 12.0). Como os alvos
+    // sao sempre x86_64, forcamos a arquitetura para nao depender da arch ativa
+    // ao compilar em Apple Silicon. Passamos tudo na linha de comando para nao
+    // editar o clone do repositorio, que e sobrescrito a cada git pull.
+    private static let xcodeBuildOverrides = "MACOSX_DEPLOYMENT_TARGET=12.0 ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO"
+
     private let runner = ShellCommandRunner()
     private let fileManager = FileManager.default
     private let dynamicInstallerItems: Set<String> = [
@@ -105,7 +112,7 @@ final class BuildPipeline {
         try await prepareKernelSDK(configuration: configuration, appendLog: appendLog)
         try prepareInstallerWorkspace(configuration: configuration, reset: false)
 
-        let command = "xcodebuild -project ./VHDAPrefPane/VoodooHDA/VoodooHDA.xcodeproj -alltargets -configuration Release build"
+        let command = "xcodebuild -project ./VHDAPrefPane/VoodooHDA/VoodooHDA.xcodeproj -alltargets -configuration Release \(Self.xcodeBuildOverrides) build"
         _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)
         try ensurePathExists(configuration.prefPaneOutputPath, description: ArtifactDescription.prefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
         appendLog(AppStrings.prefPaneBuilt(path: configuration.prefPaneOutputPath, language: configuration.appLanguage))
@@ -122,7 +129,7 @@ final class BuildPipeline {
         try prepareInstallerWorkspace(configuration: configuration, reset: false)
         try await ensureGitCommitHeader(configuration: configuration, appendLog: appendLog)
 
-        let command = "xcodebuild -project ./tranc/VoodooHDA_BS.xcodeproj -target VoodooHDA -configuration Release build"
+        let command = "xcodebuild -project ./tranc/VoodooHDA_BS.xcodeproj -target VoodooHDA -configuration Release \(Self.xcodeBuildOverrides) build"
         _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)
         try ensurePathExists(configuration.kextOutputPath, description: ArtifactDescription.kext.text(for: configuration.appLanguage), language: configuration.appLanguage)
         appendLog(AppStrings.kextBuilt(path: configuration.kextOutputPath, language: configuration.appLanguage))
