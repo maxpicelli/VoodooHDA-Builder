@@ -1,5 +1,7 @@
 # VoodooHDA Builder
 
+**Português** · [English](#english)
+
 Projeto do app macOS que automatiza o build e o empacotamento do VoodooHDA.
 
 O repositório publicado deve conter apenas os arquivos do builder. O clone local de `VoodooHDA/` nao entra aqui, porque ele e baixado separadamente do repositório original e usado apenas como base de build.
@@ -63,9 +65,13 @@ swift run
 
 ## Capturas de tela
 
-### App
+### Aba `Compilar`
 
-![Janela principal do VoodooHDA Builder](docs/images/Builder.png)
+![Aba Compilar do VoodooHDA Builder](docs/images/builder-pt-compilar.png)
+
+### Aba `Kext propria`
+
+![Aba Kext propria do VoodooHDA Builder](docs/images/builder-pt-kext-propria.png)
 
 ### Instalador
 
@@ -110,3 +116,126 @@ O cartao de status mostra a versao do VoodooHDA instalado neste Mac, lida de:
 - o app clona ou atualiza automaticamente `VoodooHDA/` e `MacKernelSDK/` quando necessario.
 - a aba `Kext propria` nao precisa do clone do `VoodooHDA` nem do `MacKernelSDK`.
 - artefatos de build do Xcode e do SwiftPM tambem ficam ignorados.
+
+---
+
+<a id="english"></a>
+
+# VoodooHDA Builder
+
+[Português](#voodoohda-builder) · **English**
+
+macOS app that automates building and packaging VoodooHDA.
+
+The published repository should contain only the builder files. The local `VoodooHDA/` clone does not belong here: it is downloaded separately from the original repository and used only as a build base.
+
+At the repository root there is a `VoodooHDA-Builder.xcworkspace` workspace pointing to the real app project at `VoodooBuilderApp/VoodooBuilderApp.xcodeproj`.
+
+## Requirements
+
+- macOS 13 or newer
+- Intel or Apple Silicon Macs (M1 through M4). On Apple Silicon the builder cross-compiles to `x86_64`, which is the VoodooHDA target
+- Xcode installed
+- Xcode Command Line Tools installed with `xcode-select --install`
+- Git available on the system
+- internet connection for the automatic clone of `VoodooHDA` and `MacKernelSDK`
+
+Python is not required to run the app or the main pipeline.
+
+## Quick Start
+
+Clone this project and open the folder in Finder:
+
+```bash
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder && open .
+```
+
+Or clone and open it straight in Xcode:
+
+```bash
+git clone https://github.com/maxpicelli/VoodooHDA-Builder.git && cd VoodooHDA-Builder && open VoodooHDA-Builder.xcworkspace
+```
+
+Then open the app. If `VoodooHDA` or `MacKernelSDK` do not exist in the chosen workspace, the builder clones them automatically.
+
+The builder tries to reuse existing local clones, but it can also download `VoodooHDA` and `MacKernelSDK` when they are not in the workspace yet.
+
+## Expected workspace layout
+
+```text
+Voodoo-HDA-builder-compiler/
+├── VoodooBuilderApp/
+├── VoodooHDA/
+└── MacKernelSDK/
+```
+
+## Open in Xcode
+
+```bash
+open VoodooHDA-Builder.xcworkspace
+```
+
+Or double-click [Open VoodooHDA Builder in Xcode.command](Open%20VoodooHDA%20Builder%20in%20Xcode.command) in Finder to open the workspace directly in Xcode.
+
+In VS Code you can also use `Run Task` and run `Open VoodooHDA Builder in Xcode`.
+
+## Run from the terminal
+
+```bash
+cd VoodooBuilderApp
+swift run
+```
+
+## Screenshots
+
+### `Build` tab
+
+![Build tab of VoodooHDA Builder](docs/images/builder-en-build.png)
+
+### `Own kext` tab
+
+![Own kext tab of VoodooHDA Builder](docs/images/builder-en-own-kext.png)
+
+### Installer
+
+![VoodooHDA installer welcome screen](docs/images/VoodooHDA-pkg.png)
+
+## What the app does
+
+The app has two tabs.
+
+### `Build` tab
+
+- reuses or downloads the local `VoodooHDA` clone
+- reuses or downloads `MacKernelSDK`
+- creates the `VoodooHDA/MacKernelSDK` symlink
+- builds `VoodooHDA.prefPane`
+- builds `VoodooHDA.kext`
+- copies the `Release` artifacts to the installer folder
+- generates `VoodooHDA.pkg` in `~/VoodooHDA-Installer-Work`
+- applies the pref pane icon to the final package
+- the `Remove VoodooHDA` button deletes the kext, the pref pane and related files from the system
+
+### `Own kext` tab
+
+Packages a `VoodooHDA.kext` you already have, without compiling anything.
+
+- pick the `.kext` with the `Choose...` button or drag the bundle from Finder onto the field
+- optionally pick or drag your own `.prefPane`; if left empty, the template one is used
+- the version is read from the kext `Info.plist` and used to name the output folder
+- generates `Kext.pkg`, `prefpane.pkg`, `getdump.pkg` and `VoodooHDA.pkg` in `~/VoodooHDA-<version>`, separate from the main flow
+- automatically adjusts the `version=` entries in `dist.xml` to match the chosen bundles
+
+### Installed version
+
+The status card shows the VoodooHDA version installed on this Mac, read from:
+
+- `/Library/Extensions/VoodooHDA.kext` (or `/System/Library/Extensions`)
+- `~/Library/PreferencePanes/VoodooHDA.prefPane` (or `/Library/PreferencePanes`)
+
+## Notes
+
+- `VoodooHDA/` is a local dependency and stays outside this repository.
+- the app clones or updates `VoodooHDA/` and `MacKernelSDK/` automatically when needed.
+- the `Own kext` tab does not need the `VoodooHDA` clone nor `MacKernelSDK`.
+- Xcode and SwiftPM build artifacts are ignored as well.
