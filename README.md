@@ -9,7 +9,7 @@ Na raiz do repositório existe um workspace `VoodooHDA-Builder.xcworkspace` que 
 ## Requisitos
 
 - macOS 13 ou mais recente
-- Processadores intel (não funciona com a séria M Apple Silicom arm64)
+- Macs Intel ou Apple Silicon (M1 ate M4). Em Apple Silicon o builder compila em cross para `x86_64`, que e o alvo do VoodooHDA
 - Xcode instalado
 - Xcode Command Line Tools instaladas com `xcode-select --install`
 - Git disponível no sistema
