@@ -10,6 +10,8 @@ struct BuildConfiguration: Codable, Equatable {
     var kernelSDKDirectory: String
     var autoOpenInstaller: Bool
     var autoOpenOutputFolder: Bool
+    var customKextPath: String
+    var customPrefPanePath: String
 
     init(
         repositoryURL: String = "https://github.com/CloverHackyColor/VoodooHDA.git",
@@ -20,7 +22,9 @@ struct BuildConfiguration: Codable, Equatable {
         installerWorkingDirectory: String? = nil,
         kernelSDKDirectory: String? = nil,
         autoOpenInstaller: Bool = false,
-        autoOpenOutputFolder: Bool = true
+        autoOpenOutputFolder: Bool = true,
+        customKextPath: String = "",
+        customPrefPanePath: String = ""
     ) {
         let normalizedWorkspaceDirectory = BuildConfiguration.normalizeWorkspaceDirectory(workspaceDirectory)
         let resolvedInstallerTemplateDirectory = installerTemplateDirectory ?? BuildConfiguration.defaultInstallerTemplateDirectory
@@ -34,6 +38,8 @@ struct BuildConfiguration: Codable, Equatable {
         self.kernelSDKDirectory = kernelSDKDirectory ?? normalizedWorkspaceDirectory + "/MacKernelSDK"
         self.autoOpenInstaller = autoOpenInstaller
         self.autoOpenOutputFolder = autoOpenOutputFolder
+        self.customKextPath = customKextPath
+        self.customPrefPanePath = customPrefPanePath
     }
 
     init(from decoder: Decoder) throws {
@@ -43,13 +49,17 @@ struct BuildConfiguration: Codable, Equatable {
         let appLanguage = try container.decodeIfPresent(AppLanguage.self, forKey: .appLanguage) ?? .ptBR
         let autoOpenInstaller = try container.decodeIfPresent(Bool.self, forKey: .autoOpenInstaller) ?? false
         let autoOpenOutputFolder = try container.decodeIfPresent(Bool.self, forKey: .autoOpenOutputFolder) ?? true
+        let customKextPath = try container.decodeIfPresent(String.self, forKey: .customKextPath) ?? ""
+        let customPrefPanePath = try container.decodeIfPresent(String.self, forKey: .customPrefPanePath) ?? ""
 
         self.init(
             repositoryURL: repositoryURL,
             appLanguage: appLanguage,
             workspaceDirectory: workspace,
             autoOpenInstaller: autoOpenInstaller,
-            autoOpenOutputFolder: autoOpenOutputFolder
+            autoOpenOutputFolder: autoOpenOutputFolder,
+            customKextPath: customKextPath,
+            customPrefPanePath: customPrefPanePath
         )
     }
 
@@ -83,6 +93,18 @@ struct BuildConfiguration: Codable, Equatable {
 
     var outputPackagePath: String {
         installerWorkingDirectory + "/VoodooHDA.pkg"
+    }
+
+    /// Saida da aba "kext propria": pasta irma da principal, com a versao no nome.
+    func customPackageDirectory(version: String) -> String {
+        workspaceDirectory + "/VoodooHDA-" + BuildConfiguration.sanitizedVersionComponent(version)
+    }
+
+    static func sanitizedVersionComponent(_ version: String) -> String {
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: ".-_"))
+        let filtered = version.unicodeScalars.map { allowed.contains($0) ? Character($0) : "-" }
+        let candidate = String(filtered).trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        return candidate.isEmpty ? "custom" : candidate
     }
 }
 

@@ -8,7 +8,7 @@ struct VoodooBuilderApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(model)
-                .frame(width: 420, height: 382)
+                .frame(width: 440, height: 430)
         }
         .windowResizability(.contentSize)
     }

@@ -29,6 +29,8 @@ enum ArtifactDescription {
     case compiledPrefPane
     case prefPaneIcon
     case package
+    case customKext
+    case customPrefPane
 
     func text(for language: AppLanguage) -> String {
         switch (self, language) {
@@ -72,6 +74,14 @@ enum ArtifactDescription {
             return "pref pane icon"
         case (.package, _):
             return "pkg"
+        case (.customKext, .ptBR):
+            return "kext selecionada"
+        case (.customKext, .eng):
+            return "selected kext"
+        case (.customPrefPane, .ptBR):
+            return "pref pane selecionada"
+        case (.customPrefPane, .eng):
+            return "selected pref pane"
         }
     }
 }
@@ -198,6 +208,10 @@ enum AppStrings {
             return "3/\(totalStepCount)  VoodooHDA.pkg pronto"
         case (.buildInstaller, .eng):
             return "3/\(totalStepCount)  VoodooHDA.pkg ready"
+        case (.packageCustomKext, .ptBR):
+            return "Pacote da kext propria pronto"
+        case (.packageCustomKext, .eng):
+            return "Custom kext package ready"
         }
     }
 
@@ -416,6 +430,161 @@ enum AppStrings {
             return "Could not apply icon to pkg at \(path)"
         }
     }
+
+    static func buildTabTitle(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Compilar"
+        case .eng:
+            return "Build"
+        }
+    }
+
+    static func customTabTitle(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Kext propria"
+        case .eng:
+            return "Own kext"
+        }
+    }
+
+    static func installedLabel(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Instalado"
+        case .eng:
+            return "Installed"
+        }
+    }
+
+    static func notInstalled(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "VoodooHDA nao instalado neste Mac"
+        case .eng:
+            return "VoodooHDA not installed on this Mac"
+        }
+    }
+
+    static func installedSummary(kext: String?, prefPane: String?, language: AppLanguage) -> String {
+        let prefPaneLabel = language == .ptBR ? "painel" : "panel"
+        var parts: [String] = []
+
+        if let kext { parts.append("kext \(kext)") }
+        if let prefPane { parts.append("\(prefPaneLabel) \(prefPane)") }
+
+        guard !parts.isEmpty else { return notInstalled(language) }
+        return installedLabel(language) + ": " + parts.joined(separator: "  ·  ")
+    }
+
+    static func refreshInstalledTooltip(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Verificar versao instalada novamente"
+        case .eng:
+            return "Check the installed version again"
+        }
+    }
+
+    static func customKextFieldLabel(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "VoodooHDA.kext"
+        case .eng:
+            return "VoodooHDA.kext"
+        }
+    }
+
+    static func customPrefPaneFieldLabel(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Pref pane (opcional)"
+        case .eng:
+            return "Pref pane (optional)"
+        }
+    }
+
+    static func chooseButton(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Escolher..."
+        case .eng:
+            return "Choose..."
+        }
+    }
+
+    static func nothingSelected(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Nenhum selecionado"
+        case .eng:
+            return "None selected"
+        }
+    }
+
+    static func dropHint(fileExtension: String, language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "arraste a .\(fileExtension) aqui"
+        case .eng:
+            return "drop the .\(fileExtension) here"
+        }
+    }
+
+    static func templatePrefPaneFallback(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Usando a pref pane do template"
+        case .eng:
+            return "Using the template pref pane"
+        }
+    }
+
+    static func customPackageButton(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Gerar pacote"
+        case .eng:
+            return "Create package"
+        }
+    }
+
+    static func customOutputNote(path: String, language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Saida: \(path)"
+        case .eng:
+            return "Output: \(path)"
+        }
+    }
+
+    static func customKextNotSelected(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Selecione uma VoodooHDA.kext antes de gerar o pacote."
+        case .eng:
+            return "Select a VoodooHDA.kext before creating the package."
+        }
+    }
+
+    static func customPackageFolder(path: String, version: String, language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Empacotando kext versao \(version) em \(path).\n"
+        case .eng:
+            return "Packaging kext version \(version) into \(path).\n"
+        }
+    }
+
+    static func customPackageBuilt(path: String, language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Pacote gerado em \(path).\n"
+        case .eng:
+            return "Package created at \(path).\n"
+        }
+    }
 }
 
 extension PipelineStep {
@@ -437,6 +606,10 @@ extension PipelineStep {
             return "Gerando VoodooHDA.pkg"
         case (.buildInstaller, .eng):
             return "Generating VoodooHDA.pkg"
+        case (.packageCustomKext, .ptBR):
+            return "Empacotando kext propria"
+        case (.packageCustomKext, .eng):
+            return "Packaging custom kext"
         }
     }
 }

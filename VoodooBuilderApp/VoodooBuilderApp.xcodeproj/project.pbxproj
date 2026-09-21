@@ -17,6 +17,7 @@
 		A10000000000000000000018 /* VoodooHDAPref.icns in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* VoodooHDAPref.icns */; };
 		A10000000000000000000019 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* Assets.xcassets */; };
 		A10000000000000000000021 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* Localization.swift */; };
+		A10000000000000000000023 /* InstalledVoodooInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* InstalledVoodooInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		A10000000000000000000009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000020 /* VoodooHDA Builder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VoodooHDA Builder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000022 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		A10000000000000000000024 /* InstalledVoodooInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledVoodooInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				A10000000000000000000005 /* BuildPipeline.swift */,
 				A10000000000000000000006 /* BuildViewModel.swift */,
 				A10000000000000000000002 /* ContentView.swift */,
+				A10000000000000000000024 /* InstalledVoodooInfo.swift */,
 				A10000000000000000000004 /* ShellCommandRunner.swift */,
 				A10000000000000000000001 /* VoodooBuilderApp.swift */,
 			);
@@ -161,6 +164,7 @@
 				A10000000000000000000015 /* BuildPipeline.swift in Sources */,
 				A10000000000000000000016 /* BuildViewModel.swift in Sources */,
 				A10000000000000000000012 /* ContentView.swift in Sources */,
+				A10000000000000000000023 /* InstalledVoodooInfo.swift in Sources */,
 				A10000000000000000000014 /* ShellCommandRunner.swift in Sources */,
 				A10000000000000000000011 /* VoodooBuilderApp.swift in Sources */,
 			);

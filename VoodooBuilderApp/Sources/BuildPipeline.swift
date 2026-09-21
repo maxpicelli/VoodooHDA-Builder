@@ -6,6 +6,7 @@ enum PipelineStep: String, CaseIterable, Identifiable {
     case buildKext
     case buildPrefPane
     case buildInstaller
+    case packageCustomKext
 
     var id: String { rawValue }
 }
@@ -40,6 +41,8 @@ final class BuildPipeline {
             try await buildKext(configuration: configuration, appendLog: appendLog)
         case .buildInstaller:
             try await buildInstaller(configuration: configuration, appendLog: appendLog)
+        case .packageCustomKext:
+            try await packageCustomKext(configuration: configuration, appendLog: appendLog)
         }
     }
 
@@ -163,6 +166,99 @@ final class BuildPipeline {
         appendLog(AppStrings.installerFolderOpened(configuration.appLanguage))
     }
 
+    // Empacota uma VoodooHDA.kext ja pronta, sem compilar nada. Reaproveita o
+    // template/makeInstall.sh do fluxo principal, mas em uma pasta de saida
+    // separada, nomeada com a versao lida do Info.plist da kext escolhida.
+    private func packageCustomKext(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
+        let language = configuration.appLanguage
+        let kextPath = configuration.customKextPath.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !kextPath.isEmpty else {
+            throw NSError(domain: "VoodooBuilderApp", code: 10, userInfo: [NSLocalizedDescriptionKey: AppStrings.customKextNotSelected(language)])
+        }
+
+        try ensurePathExists(kextPath, description: ArtifactDescription.customKext.text(for: language), language: language)
+        try ensurePathExists(configuration.installerTemplateDirectory, description: ArtifactDescription.installerTemplate.text(for: language), language: language)
+
+        let kextVersion = InstalledVoodooInfo.bundleVersion(atBundlePath: kextPath) ?? "custom"
+        let workingDirectory = configuration.customPackageDirectory(version: kextVersion)
+        appendLog(AppStrings.customPackageFolder(path: workingDirectory, version: kextVersion, language: language))
+
+        if fileManager.fileExists(atPath: workingDirectory) {
+            try fileManager.removeItem(atPath: workingDirectory)
+        }
+
+        let parentDirectory = URL(fileURLWithPath: workingDirectory).deletingLastPathComponent()
+        try fileManager.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
+        try fileManager.copyItem(atPath: configuration.installerTemplateDirectory, toPath: workingDirectory)
+
+        try replaceItem(at: workingDirectory + "/VoodooHDA.kext", with: kextPath)
+
+        let customPrefPane = configuration.customPrefPanePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !customPrefPane.isEmpty {
+            try ensurePathExists(customPrefPane, description: ArtifactDescription.customPrefPane.text(for: language), language: language)
+            try replaceItem(at: workingDirectory + "/VoodooHDA.prefPane", with: customPrefPane)
+        }
+
+        let prefPanePath = workingDirectory + "/VoodooHDA.prefPane"
+        try ensurePathExists(prefPanePath, description: ArtifactDescription.installerPrefPane.text(for: language), language: language)
+
+        try updateDistributionVersion(workingDirectory: workingDirectory, identifier: "org.voodoo.driver.VoodooHDA", version: kextVersion)
+        if let prefPaneVersion = InstalledVoodooInfo.bundleVersion(atBundlePath: prefPanePath) {
+            try updateDistributionVersion(workingDirectory: workingDirectory, identifier: "org.voodoo.VoodooHDA", version: prefPaneVersion)
+        }
+
+        let scriptPath = workingDirectory + "/makeInstall.sh"
+        try ensurePathExists(scriptPath, description: ArtifactDescription.installerScript.text(for: language), language: language)
+        _ = try await runner.run("chmod +x ./makeInstall.sh && ./makeInstall.sh", in: workingDirectory, onOutput: appendLog)
+
+        let packagePath = workingDirectory + "/VoodooHDA.pkg"
+        try ensurePathExists(packagePath, description: "VoodooHDA.pkg", language: language)
+
+        if applyBestEffortPackageIcon(configuration: configuration, packagePath: packagePath, prefPanePath: prefPanePath) {
+            appendLog(AppStrings.packageIconApplied(language))
+        }
+
+        appendLog(AppStrings.customPackageBuilt(path: packagePath, language: language))
+        _ = try await runner.run("open \(workingDirectory.shellQuoted)", in: workingDirectory, onOutput: appendLog)
+    }
+
+    private func updateDistributionVersion(workingDirectory: String, identifier: String, version: String) throws {
+        let distributionPath = workingDirectory + "/dist.xml"
+        guard fileManager.fileExists(atPath: distributionPath) else { return }
+
+        let contents = try String(contentsOfFile: distributionPath, encoding: .utf8)
+        let pattern = "(<pkg-ref\\s+id=\"\(NSRegularExpression.escapedPattern(for: identifier))\"\\s+version=\")[^\"]*(\")"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+
+        let range = NSRange(contents.startIndex..<contents.endIndex, in: contents)
+        let escapedVersion = version.replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+        let template = "$1\(NSRegularExpression.escapedTemplate(for: escapedVersion))$2"
+        let updated = regex.stringByReplacingMatches(in: contents, range: range, withTemplate: template)
+
+        guard updated != contents else { return }
+        try updated.write(toFile: distributionPath, atomically: true, encoding: .utf8)
+    }
+
+    private func applyBestEffortPackageIcon(configuration: BuildConfiguration, packagePath: String, prefPanePath: String) -> Bool {
+        let candidates = [
+            prefPanePath + "/Contents/Resources/VoodooHDAPref.icns",
+            configuration.prefPaneIconPath,
+            configuration.sourcePrefPaneIconPath
+        ]
+
+        guard
+            let iconPath = candidates.first(where: { fileManager.fileExists(atPath: $0) }),
+            let image = NSImage(contentsOfFile: iconPath)
+        else {
+            return false
+        }
+
+        return NSWorkspace.shared.setIcon(image, forFile: packagePath, options: [])
+    }
+
     private func prepareInstallerWorkspace(configuration: BuildConfiguration, reset: Bool) throws {
         try ensurePathExists(configuration.installerTemplateDirectory, description: ArtifactDescription.installerTemplate.text(for: configuration.appLanguage), language: configuration.appLanguage)
 
@@ -211,8 +307,7 @@ final class BuildPipeline {
         try replaceItem(at: prefPaneDestination, with: configuration.prefPaneOutputPath)
     }
 
-    private func ensurePathExists(_ path: String, description: String, language: AppLanguage) throws {
-        if !fileManager.fileExists(atPath: path) {
+    private func ensurePathExists(_ path: String, description: String, language: AppLanguage) throws {        if !fileManager.fileExists(atPath: path) {
             throw NSError(domain: "VoodooBuilderApp", code: 1, userInfo: [NSLocalizedDescriptionKey: AppStrings.pathNotFound(description: description, path: path, language: language)])
         }
     }

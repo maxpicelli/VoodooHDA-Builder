@@ -4,16 +4,33 @@ import SwiftUI
 @MainActor
 final class BuildViewModel: ObservableObject {
     private let totalStepCount = 3
+    private static let standaloneSteps: Set<PipelineStep> = [.removePrevious, .packageCustomKext]
 
     @Published var configuration: BuildConfiguration
     @Published var logOutput: String = ""
     @Published var isRunning = false
     @Published var activeStep: PipelineStep?
     @Published var status: BuildStatus = .ready
+    @Published var installedInfo: InstalledVoodooInfo = .empty
     @Published private var completedStepCount = 0
+    @Published private var standaloneProgress: Double?
+
+    var customKextVersion: String? {
+        let path = configuration.customKextPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !path.isEmpty else { return nil }
+        return InstalledVoodooInfo.bundleVersion(atBundlePath: path)
+    }
+
+    var customOutputDirectory: String {
+        configuration.customPackageDirectory(version: customKextVersion ?? "custom")
+    }
 
     var progressLine: String {
         if let step = activeStep {
+            if Self.standaloneSteps.contains(step) {
+                return step.title(for: configuration.appLanguage)
+            }
+
             return AppStrings.runningProgress(completed: completedStepCount, total: totalStepCount, step: step, language: configuration.appLanguage)
         }
 
@@ -21,6 +38,10 @@ final class BuildViewModel: ObservableObject {
     }
 
     var progressValue: Double {
+        if let standaloneProgress {
+            return standaloneProgress
+        }
+
         let total = Double(totalStepCount)
 
         if isRunning {
@@ -45,6 +66,21 @@ final class BuildViewModel: ObservableObject {
         }
 
         repairInvalidPathsIfNeeded()
+        refreshInstalledInfo()
+    }
+
+    func refreshInstalledInfo() {
+        installedInfo = InstalledVoodooInfo.current()
+    }
+
+    func updateCustomKextPath(_ path: String) {
+        configuration.customKextPath = path
+        persistConfiguration()
+    }
+
+    func updateCustomPrefPanePath(_ path: String) {
+        configuration.customPrefPanePath = path
+        persistConfiguration()
     }
 
     func run(step: PipelineStep) {
@@ -88,7 +124,9 @@ final class BuildViewModel: ObservableObject {
             appLanguage: configuration.appLanguage,
             workspaceDirectory: normalizedWorkspace,
             autoOpenInstaller: configuration.autoOpenInstaller,
-            autoOpenOutputFolder: configuration.autoOpenOutputFolder
+            autoOpenOutputFolder: configuration.autoOpenOutputFolder,
+            customKextPath: configuration.customKextPath,
+            customPrefPanePath: configuration.customPrefPanePath
         )
         persistConfiguration()
     }
@@ -96,6 +134,8 @@ final class BuildViewModel: ObservableObject {
     private func execute(step: PipelineStep) async {
         guard !isRunning else { return }
         isRunning = true
+        let isStandalone = Self.standaloneSteps.contains(step)
+        standaloneProgress = isStandalone ? 0.35 : nil
         completedStepCount = completedCount(for: step)
         activeStep = step
         status = .ready
@@ -103,19 +143,26 @@ final class BuildViewModel: ObservableObject {
 
         do {
             try await pipeline.run(step: step, configuration: configuration, appendLog: appendLog)
-            completedStepCount = completedCount(for: step) + (step == .removePrevious ? 0 : 1)
+            if isStandalone {
+                standaloneProgress = 1
+            } else {
+                completedStepCount = completedCount(for: step) + 1
+            }
             status = .stepSucceeded(step)
         } catch {
+            appendLog(error.localizedDescription + "\n")
             status = .failed(step)
         }
 
         activeStep = nil
         isRunning = false
+        refreshInstalledInfo()
     }
 
     private func executeAll() async {
         guard !isRunning else { return }
         isRunning = true
+        standaloneProgress = nil
         completedStepCount = 0
         status = .ready
         persistConfiguration()
@@ -132,16 +179,18 @@ final class BuildViewModel: ObservableObject {
             completedStepCount = steps.count
             status = .allSucceeded
         } catch {
+            appendLog(error.localizedDescription + "\n")
             status = .failed(activeStep)
         }
 
         activeStep = nil
         isRunning = false
+        refreshInstalledInfo()
     }
 
     private func completedCount(for step: PipelineStep) -> Int {
         switch step {
-        case .removePrevious:
+        case .removePrevious, .packageCustomKext:
             return 0
         case .buildKext:
             return 0
