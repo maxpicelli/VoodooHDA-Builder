@@ -73,18 +73,40 @@ swift run
 
 ## O que o app faz
 
+O app tem duas abas.
+
+### Aba `Compilar`
+
 - reutiliza ou baixa o clone local de `VoodooHDA`
 - reutiliza ou baixa o `MacKernelSDK`
 - cria o link simbolico `VoodooHDA/MacKernelSDK`
 - compila `VoodooHDA.prefPane`
 - compila `VoodooHDA.kext`
 - copia os artefatos `Release` para a pasta do instalador
-- gera o `VoodooHDA.pkg`
-- copia o `.pkg` final para a Mesa
+- gera o `VoodooHDA.pkg` em `~/VoodooHDA-Installer-Work`
 - aplica o icone do pref pane ao pacote final
+- botao `Remover VoodooHDA` apaga a kext, o pref pane e os arquivos relacionados do sistema
+
+### Aba `Kext propria`
+
+Empacota uma `VoodooHDA.kext` que voce ja tem, sem compilar nada.
+
+- escolha a `.kext` pelo botao `Escolher...` ou arraste o bundle do Finder para o campo
+- opcionalmente escolha ou arraste uma `.prefPane` propria; se deixar vazio, usa a do template
+- a versao e lida do `Info.plist` da kext e usada para nomear a pasta de saida
+- gera `Kext.pkg`, `prefpane.pkg`, `getdump.pkg` e `VoodooHDA.pkg` em `~/VoodooHDA-<versao>`, separado do fluxo principal
+- ajusta automaticamente os `version=` do `dist.xml` conforme os bundles escolhidos
+
+### Versao instalada
+
+O cartao de status mostra a versao do VoodooHDA instalado neste Mac, lida de:
+
+- `/Library/Extensions/VoodooHDA.kext` (ou `/System/Library/Extensions`)
+- `~/Library/PreferencePanes/VoodooHDA.prefPane` (ou `/Library/PreferencePanes`)
 
 ## Notas
 
 - `VoodooHDA/` e uma dependencia local e fica fora deste repositório.
 - o app clona ou atualiza automaticamente `VoodooHDA/` e `MacKernelSDK/` quando necessario.
+- a aba `Kext propria` nao precisa do clone do `VoodooHDA` nem do `MacKernelSDK`.
 - artefatos de build do Xcode e do SwiftPM tambem ficam ignorados.
