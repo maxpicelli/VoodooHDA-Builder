@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 struct ShellCommandResult {
     let command: String
@@ -18,6 +19,11 @@ enum ShellCommandError: LocalizedError {
 }
 
 final class ShellCommandRunner {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "VoodooBuilderApp",
+        category: "Shell"
+    )
+
     func run(
         _ command: String,
         in workingDirectory: String,
@@ -38,6 +44,8 @@ final class ShellCommandRunner {
             process.standardOutput = stdout
             process.standardError = stderr
 
+            Self.logger.info("Running in \(workingDirectory, privacy: .public): \(command, privacy: .public)")
+
             var mergedEnvironment = ProcessInfo.processInfo.environment
             environment.forEach { mergedEnvironment[$0.key] = $0.value }
             process.environment = mergedEnvironment
@@ -47,6 +55,7 @@ final class ShellCommandRunner {
                 outputQueue.async {
                     buffer.append(data)
                     if let chunk = String(data: data, encoding: .utf8), !chunk.isEmpty {
+                        Self.logger.info("\(chunk, privacy: .public)")
                         Task { @MainActor in
                             onOutput(chunk)
                         }
@@ -72,6 +81,8 @@ final class ShellCommandRunner {
                         exitCode: process.terminationStatus,
                         output: String(data: buffer, encoding: .utf8) ?? ""
                     )
+
+                    Self.logger.info("Command finished with exit code \(process.terminationStatus)")
 
                     if process.terminationStatus == 0 {
                         continuation.resume(returning: result)

@@ -19,11 +19,14 @@ final class BuildPipeline {
     // ao compilar em Apple Silicon. Passamos tudo na linha de comando para nao
     // editar o clone do repositorio, que e sobrescrito a cada git pull.
     private static let xcodeBuildOverrides = "MACOSX_DEPLOYMENT_TARGET=12.0 ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO"
+    private static let installerKextName = "VoodooHDA.kext"
 
     private let runner = ShellCommandRunner()
     private let fileManager = FileManager.default
     private let dynamicInstallerItems: Set<String> = [
         "VoodooHDA.kext",
+        "VoodooHDA_LE.kext",
+        "VoodooHDA_BL.kext",
         "VoodooHDA.prefPane",
         "Kext.pkg",
         "prefpane.pkg",
@@ -137,7 +140,8 @@ final class BuildPipeline {
         try ensurePathExists(configuration.kextOutputPath, description: ArtifactDescription.kext.text(for: configuration.appLanguage), language: configuration.appLanguage)
         appendLog(AppStrings.kextBuilt(path: configuration.kextOutputPath, language: configuration.appLanguage))
 
-        let kextDestination = configuration.installerWorkingDirectory + "/VoodooHDA.kext"
+        try removeInstallerKexts(in: configuration.installerWorkingDirectory)
+        let kextDestination = configuration.installerWorkingDirectory + "/" + Self.installerKextName
         try replaceItem(at: kextDestination, with: configuration.kextOutputPath)
         try ensurePathExists(kextDestination, description: ArtifactDescription.copiedKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
         appendLog(AppStrings.kextCopied(path: kextDestination, language: configuration.appLanguage))
@@ -146,7 +150,7 @@ final class BuildPipeline {
     private func buildInstaller(configuration: BuildConfiguration, appendLog: @escaping (String) -> Void) async throws {
         try prepareInstallerWorkspace(configuration: configuration, reset: false)
         try syncCompiledInstallerArtifacts(configuration: configuration)
-        try ensurePathExists(configuration.installerWorkingDirectory + "/VoodooHDA.kext", description: ArtifactDescription.installerKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
+        try ensurePathExists(configuration.installerWorkingDirectory + "/" + Self.installerKextName, description: ArtifactDescription.installerKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
         try ensurePathExists(configuration.installerWorkingDirectory + "/VoodooHDA.prefPane", description: ArtifactDescription.installerPrefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
         try ensurePathExists(configuration.installerScriptPath, description: ArtifactDescription.installerScript.text(for: configuration.appLanguage), language: configuration.appLanguage)
         let scriptDirectory = URL(fileURLWithPath: configuration.installerScriptPath).deletingLastPathComponent().path
@@ -192,7 +196,8 @@ final class BuildPipeline {
         try fileManager.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
         try fileManager.copyItem(atPath: configuration.installerTemplateDirectory, toPath: workingDirectory)
 
-        try replaceItem(at: workingDirectory + "/VoodooHDA.kext", with: kextPath)
+        try removeInstallerKexts(in: workingDirectory)
+        try replaceItem(at: workingDirectory + "/" + Self.installerKextName, with: kextPath)
 
         let customPrefPane = configuration.customPrefPanePath.trimmingCharacters(in: .whitespacesAndNewlines)
         if !customPrefPane.isEmpty {
@@ -300,11 +305,21 @@ final class BuildPipeline {
         try ensurePathExists(configuration.kextOutputPath, description: ArtifactDescription.compiledKext.text(for: configuration.appLanguage), language: configuration.appLanguage)
         try ensurePathExists(configuration.prefPaneOutputPath, description: ArtifactDescription.compiledPrefPane.text(for: configuration.appLanguage), language: configuration.appLanguage)
 
-        let kextDestination = configuration.installerWorkingDirectory + "/VoodooHDA.kext"
+        try removeInstallerKexts(in: configuration.installerWorkingDirectory)
+        let kextDestination = configuration.installerWorkingDirectory + "/" + Self.installerKextName
         let prefPaneDestination = configuration.installerWorkingDirectory + "/VoodooHDA.prefPane"
 
         try replaceItem(at: kextDestination, with: configuration.kextOutputPath)
         try replaceItem(at: prefPaneDestination, with: configuration.prefPaneOutputPath)
+    }
+
+    private func removeInstallerKexts(in directory: String) throws {
+        for name in ["VoodooHDA.kext", "VoodooHDA_LE.kext", "VoodooHDA_BL.kext"] {
+            let path = directory + "/" + name
+            if fileManager.fileExists(atPath: path) {
+                try fileManager.removeItem(atPath: path)
+            }
+        }
     }
 
     private func ensurePathExists(_ path: String, description: String, language: AppLanguage) throws {        if !fileManager.fileExists(atPath: path) {

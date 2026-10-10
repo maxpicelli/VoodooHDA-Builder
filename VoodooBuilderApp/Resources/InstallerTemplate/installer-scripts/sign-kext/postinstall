@@ -1,15 +1,39 @@
 #!/bin/sh
 
-LOG_FILE="/private/tmp/VoodooHDA-sign.log"
-KEXT_PATH="/Library/Extensions/VoodooHDA.kext"
+LOG_FILE="/private/tmp/VoodooHDA-install.log"
+KEXT_PATH=""
+
+for CANDIDATE in \
+    /Library/Extensions/VoodooHDA.kext \
+    /Library/Extensions/VoodooHDA_LE.kext \
+    /Library/Extensions/VoodooHDA_BL.kext; do
+    if [ -d "$CANDIDATE" ]; then
+        KEXT_PATH="$CANDIDATE"
+        break
+    fi
+done
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] sign start" >> "$LOG_FILE"
 
-if [ -d "$KEXT_PATH" ]; then
-    /usr/bin/codesign --force --deep --sign - "$KEXT_PATH" >> "$LOG_FILE" 2>&1 || true
-    /usr/bin/codesign -dv --verbose=4 "$KEXT_PATH" >> "$LOG_FILE" 2>&1 || true
+if [ -z "$KEXT_PATH" ]; then
+    echo "VoodooHDA kext not found after installation" >> "$LOG_FILE"
+    exit 1
 fi
 
+/usr/sbin/chown -R root:wheel "$KEXT_PATH"
+/bin/chmod -R go-w "$KEXT_PATH"
+/usr/bin/codesign --force --deep --sign - "$KEXT_PATH" >> "$LOG_FILE" 2>&1
+/usr/bin/codesign --verify --deep --strict --verbose=4 "$KEXT_PATH" >> "$LOG_FILE" 2>&1
+
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] sign end" >> "$LOG_FILE"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] kernel collection update start" >> "$LOG_FILE"
+/usr/bin/kmutil install --volume-root / --update-all >> "$LOG_FILE" 2>&1
+RESULT=$?
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] kernel collection update end ($RESULT)" >> "$LOG_FILE"
+
+if [ "$RESULT" -ne 0 ]; then
+    echo "Kernel collection was not rebuilt; a matching KDK may be required. The kext remains installed." >> "$LOG_FILE"
+fi
 
 exit 0

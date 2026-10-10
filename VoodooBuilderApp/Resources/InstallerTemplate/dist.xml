@@ -19,7 +19,7 @@
     <choice id="org.voodoo.driver.VoodooHDA" visible="false">
         <pkg-ref id="org.voodoo.driver.VoodooHDA"/>
     </choice>
-    <pkg-ref id="org.voodoo.driver.VoodooHDA" version="3.1.2" onConclusion="none">Kext.pkg</pkg-ref>
+    <pkg-ref id="org.voodoo.driver.VoodooHDA" version="3.1.2" onConclusion="RequireRestart">Kext.pkg</pkg-ref>
     <choice id="org.voodoo.VoodooHDA" visible="false">
         <pkg-ref id="org.voodoo.VoodooHDA"/>
     </choice>

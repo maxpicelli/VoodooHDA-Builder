@@ -1,0 +1,13 @@
+#!/bin/sh
+
+LOG_FILE="/private/tmp/VoodooHDA-install.log"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] cleanup start" >> "$LOG_FILE"
+
+rm -rf /Library/Extensions/VoodooHDA.kext \
+    /Library/Extensions/VoodooHDA_LE.kext \
+    /Library/Extensions/VoodooHDA_BL.kext
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] cleanup end" >> "$LOG_FILE"
+
+exit 0
