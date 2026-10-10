@@ -67,7 +67,7 @@ swift run
 
 ### Aba `Compilar`
 
-![Aba Compilar do VoodooHDA Builder](docs/images/builder-pt-compilar.png)
+![Aba Compilar do VoodooHDA Builder](docs/images/builder-pt-compilar-le-bl.png)
 
 ### Aba `Kext propria`
 
