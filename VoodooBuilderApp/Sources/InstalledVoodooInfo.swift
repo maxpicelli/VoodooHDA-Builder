@@ -45,7 +45,11 @@ struct InstalledVoodooInfo: Equatable {
     private static var kextSearchPaths: [String] {
         [
             "/Library/Extensions/VoodooHDA.kext",
-            "/System/Library/Extensions/VoodooHDA.kext"
+            "/Library/Extensions/VoodooHDA_LE.kext",
+            "/Library/Extensions/VoodooHDA_BL.kext",
+            "/System/Library/Extensions/VoodooHDA.kext",
+            "/System/Library/Extensions/VoodooHDA_LE.kext",
+            "/System/Library/Extensions/VoodooHDA_BL.kext"
         ]
     }
 
