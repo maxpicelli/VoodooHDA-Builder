@@ -191,7 +191,7 @@ swift run
 
 ### `Build` tab
 
-![Build tab of VoodooHDA Builder](docs/images/builder-en-build.png)
+![Build tab of VoodooHDA Builder](docs/images/builder-en-build-le-bl-dark.png)
 
 ### `Own kext` tab
 
