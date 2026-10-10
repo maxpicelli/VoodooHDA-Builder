@@ -106,6 +106,12 @@ final class BuildViewModel: ObservableObject {
         persistConfiguration()
     }
 
+    func updateKextVariant(_ variant: KextVariant) {
+        guard configuration.kextVariant != variant else { return }
+        configuration.kextVariant = variant
+        persistConfiguration()
+    }
+
     private func repairInvalidPathsIfNeeded() {
         let normalizedWorkspace = BuildConfiguration.normalizeWorkspaceDirectory(configuration.workspaceDirectory)
         let hasLegacyRepositoryPath = configuration.repositoryDirectory == "//VoodooHDA"
@@ -123,6 +129,7 @@ final class BuildViewModel: ObservableObject {
             repositoryURL: configuration.repositoryURL,
             appLanguage: configuration.appLanguage,
             workspaceDirectory: normalizedWorkspace,
+            kextVariant: configuration.kextVariant,
             autoOpenInstaller: configuration.autoOpenInstaller,
             autoOpenOutputFolder: configuration.autoOpenOutputFolder,
             customKextPath: configuration.customKextPath,

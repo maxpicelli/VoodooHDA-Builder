@@ -6,7 +6,8 @@ App SwiftUI para macOS que automatiza o pipeline do projeto VoodooHDA:
 - clonar ou reutilizar o MacKernelSDK
 - criar o link simbolico `VoodooHDA/MacKernelSDK`
 - compilar `VoodooHDA.prefPane`
-- compilar `VoodooHDA.kext` via `tranc/VoodooHDA_BS.xcodeproj`
+- escolher entre `VoodooHDA_LE.kext` e `VoodooHDA_BL.kext`, com `LE` como padrao para criar o `.pkg`
+- compilar a kext via `tranc/VoodooHDA_LE.xcodeproj` ou `tranc/VoodooHDA_BL.xcodeproj`
 - copiar para a pasta do instalador exatamente os artefatos `Release` compilados no clone local
 - executar `makeInstall.sh` para gerar `VoodooHDA.pkg`
 - copiar o `VoodooHDA.pkg` final para a Mesa

@@ -87,7 +87,8 @@ O app tem duas abas.
 - reutiliza ou baixa o `MacKernelSDK`
 - cria o link simbolico `VoodooHDA/MacKernelSDK`
 - compila `VoodooHDA.prefPane`
-- compila `VoodooHDA.kext`
+- permite escolher a variante `LE` ou `BL` da kext; `LE` e o padrao para criar o `.pkg`
+- compila `VoodooHDA_LE.kext` ou `VoodooHDA_BL.kext` pelo projeto upstream correspondente
 - copia os artefatos `Release` para a pasta do instalador
 - gera o `VoodooHDA.pkg` em `~/VoodooHDA-Installer-Work`
 - aplica o icone do pref pane ao pacote final
@@ -210,7 +211,8 @@ The app has two tabs.
 - reuses or downloads `MacKernelSDK`
 - creates the `VoodooHDA/MacKernelSDK` symlink
 - builds `VoodooHDA.prefPane`
-- builds `VoodooHDA.kext`
+- lets you choose the `LE` or `BL` kext variant; `LE` is the default for creating the `.pkg`
+- builds `VoodooHDA_LE.kext` or `VoodooHDA_BL.kext` from the matching upstream project
 - copies the `Release` artifacts to the installer folder
 - generates `VoodooHDA.pkg` in `~/VoodooHDA-Installer-Work`
 - applies the pref pane icon to the final package

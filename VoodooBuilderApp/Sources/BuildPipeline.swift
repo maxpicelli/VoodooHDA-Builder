@@ -132,7 +132,7 @@ final class BuildPipeline {
         try prepareInstallerWorkspace(configuration: configuration, reset: false)
         try await ensureGitCommitHeader(configuration: configuration, appendLog: appendLog)
 
-        let command = "xcodebuild -project ./tranc/VoodooHDA_BS.xcodeproj -target VoodooHDA -configuration Release \(Self.xcodeBuildOverrides) build"
+        let command = "xcodebuild -project \(configuration.kextProjectPath.shellQuoted) -target VoodooHDA -configuration Release \(Self.xcodeBuildOverrides) build"
         _ = try await runner.run(command, in: configuration.repositoryDirectory, onOutput: appendLog)
         try ensurePathExists(configuration.kextOutputPath, description: ArtifactDescription.kext.text(for: configuration.appLanguage), language: configuration.appLanguage)
         appendLog(AppStrings.kextBuilt(path: configuration.kextOutputPath, language: configuration.appLanguage))

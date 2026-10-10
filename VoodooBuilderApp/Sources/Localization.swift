@@ -177,6 +177,39 @@ enum AppStrings {
         }
     }
 
+    static func kextVariantLabel(_ language: AppLanguage) -> String {
+        switch language {
+        case .ptBR:
+            return "Tipo de kext"
+        case .eng:
+            return "Kext type"
+        }
+    }
+
+    static func kextVariantTitle(_ variant: KextVariant, language: AppLanguage) -> String {
+        switch (variant, language) {
+        case (.libraryExtensions, .ptBR):
+            return "LE - Instalador"
+        case (.libraryExtensions, .eng):
+            return "LE - Installer"
+        case (.bootloader, _):
+            return "BL - Bootloader"
+        }
+    }
+
+    static func kextVariantNote(_ variant: KextVariant, language: AppLanguage) -> String {
+        switch (variant, language) {
+        case (.libraryExtensions, .ptBR):
+            return "Para instalar em /Library/Extensions; requer SIP reduzido e aprovacao."
+        case (.libraryExtensions, .eng):
+            return "For /Library/Extensions; requires reduced SIP and approval."
+        case (.bootloader, .ptBR):
+            return "Para injetar pelo OpenCore ou Clover; funciona com SIP completo."
+        case (.bootloader, .eng):
+            return "For OpenCore or Clover injection; works with full SIP."
+        }
+    }
+
     static func autoOpenNote(_ language: AppLanguage) -> String {
         switch language {
         case .ptBR:

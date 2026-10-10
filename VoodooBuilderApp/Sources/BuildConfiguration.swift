@@ -1,5 +1,16 @@
 import Foundation
 
+enum KextVariant: String, Codable, CaseIterable, Identifiable {
+    case libraryExtensions = "LE"
+    case bootloader = "BL"
+
+    var id: String { rawValue }
+
+    var productName: String {
+        "VoodooHDA_\(rawValue).kext"
+    }
+}
+
 struct BuildConfiguration: Codable, Equatable {
     var repositoryURL: String = "https://github.com/CloverHackyColor/VoodooHDA.git"
     var appLanguage: AppLanguage
@@ -8,6 +19,7 @@ struct BuildConfiguration: Codable, Equatable {
     var installerTemplateDirectory: String
     var installerWorkingDirectory: String
     var kernelSDKDirectory: String
+    var kextVariant: KextVariant
     var autoOpenInstaller: Bool
     var autoOpenOutputFolder: Bool
     var customKextPath: String
@@ -21,6 +33,7 @@ struct BuildConfiguration: Codable, Equatable {
         installerTemplateDirectory: String? = nil,
         installerWorkingDirectory: String? = nil,
         kernelSDKDirectory: String? = nil,
+        kextVariant: KextVariant = .libraryExtensions,
         autoOpenInstaller: Bool = false,
         autoOpenOutputFolder: Bool = true,
         customKextPath: String = "",
@@ -36,6 +49,7 @@ struct BuildConfiguration: Codable, Equatable {
         self.installerTemplateDirectory = resolvedInstallerTemplateDirectory
         self.installerWorkingDirectory = installerWorkingDirectory ?? normalizedWorkspaceDirectory + "/VoodooHDA-Installer-Work"
         self.kernelSDKDirectory = kernelSDKDirectory ?? normalizedWorkspaceDirectory + "/MacKernelSDK"
+        self.kextVariant = kextVariant
         self.autoOpenInstaller = autoOpenInstaller
         self.autoOpenOutputFolder = autoOpenOutputFolder
         self.customKextPath = customKextPath
@@ -47,6 +61,7 @@ struct BuildConfiguration: Codable, Equatable {
         let workspace = try container.decodeIfPresent(String.self, forKey: .workspaceDirectory) ?? BuildConfiguration.defaultWorkspaceDirectory
         let repositoryURL = try container.decodeIfPresent(String.self, forKey: .repositoryURL) ?? "https://github.com/CloverHackyColor/VoodooHDA.git"
         let appLanguage = try container.decodeIfPresent(AppLanguage.self, forKey: .appLanguage) ?? .ptBR
+        let kextVariant = try container.decodeIfPresent(KextVariant.self, forKey: .kextVariant) ?? .libraryExtensions
         let autoOpenInstaller = try container.decodeIfPresent(Bool.self, forKey: .autoOpenInstaller) ?? false
         let autoOpenOutputFolder = try container.decodeIfPresent(Bool.self, forKey: .autoOpenOutputFolder) ?? true
         let customKextPath = try container.decodeIfPresent(String.self, forKey: .customKextPath) ?? ""
@@ -56,6 +71,7 @@ struct BuildConfiguration: Codable, Equatable {
             repositoryURL: repositoryURL,
             appLanguage: appLanguage,
             workspaceDirectory: workspace,
+            kextVariant: kextVariant,
             autoOpenInstaller: autoOpenInstaller,
             autoOpenOutputFolder: autoOpenOutputFolder,
             customKextPath: customKextPath,
@@ -68,7 +84,7 @@ struct BuildConfiguration: Codable, Equatable {
     }
 
     var kextProjectPath: String {
-        repositoryDirectory + "/tranc/VoodooHDA_BS.xcodeproj"
+        repositoryDirectory + "/tranc/VoodooHDA_\(kextVariant.rawValue).xcodeproj"
     }
 
     var prefPaneOutputPath: String {
@@ -84,7 +100,7 @@ struct BuildConfiguration: Codable, Equatable {
     }
 
     var kextOutputPath: String {
-        repositoryDirectory + "/tranc/build/Release/VoodooHDA.kext"
+        repositoryDirectory + "/tranc/build/Release/\(kextVariant.productName)"
     }
 
     var installerScriptPath: String {

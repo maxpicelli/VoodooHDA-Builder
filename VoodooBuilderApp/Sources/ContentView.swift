@@ -181,6 +181,22 @@ struct ContentView: View {
 
     private var buildTab: some View {
         VStack(spacing: 10) {
+            Picker(AppStrings.kextVariantLabel(language), selection: Binding(get: {
+                model.configuration.kextVariant
+            }, set: { model.updateKextVariant($0) })) {
+                ForEach(KextVariant.allCases) { variant in
+                    Text(AppStrings.kextVariantTitle(variant, language: language)).tag(variant)
+                }
+            }
+            .pickerStyle(.segmented)
+            .disabled(model.isRunning)
+
+            Text(AppStrings.kextVariantNote(model.configuration.kextVariant, language: language))
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
             Button(model.isRunning ? AppStrings.processingButton(language) : AppStrings.buildButton(language)) {
                 model.runAll()
             }
